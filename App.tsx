@@ -73,7 +73,7 @@ export default function App() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeAreaView className="flex-1 bg-background dark:bg-dark-background">
       <View className="flex-1">
         <ScrollView
           className="flex-1"

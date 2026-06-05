@@ -13,7 +13,7 @@ type CourseCardProps = {
 
 export function CourseCard({ course, isTablet }: CourseCardProps) {
   return (
-    <View className="rounded-xl border border-border bg-card p-4 shadow-sm" style={{ width: isTablet ? "48.5%" : "100%" }}>
+    <View className="rounded-xl border border-border dark:border-dark-border bg-card dark:bg-dark-card p-4 shadow-sm" style={{ width: isTablet ? "48.5%" : "100%" }}>
       <View className="flex-row items-start justify-between gap-3">
         <View className="flex-1 flex-row gap-3">
           <View className="h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-500">
@@ -21,13 +21,13 @@ export function CourseCard({ course, isTablet }: CourseCardProps) {
           </View>
           <View className="flex-1">
             <Text className="text-xs font-bold uppercase text-brand-600">{course.code}</Text>
-            <Text className="mt-1 text-base font-bold text-foreground">{course.title}</Text>
-            <Text className="mt-1 text-sm text-muted-foreground">{course.instructor}</Text>
+            <Text className="mt-1 text-base font-bold text-foreground dark:text-dark-foreground">{course.title}</Text>
+            <Text className="mt-1 text-sm text-muted-foreground dark:text-dark-muted-foreground">{course.instructor}</Text>
           </View>
         </View>
         {course.liveNow ? <Badge label="Live" /> : null}
       </View>
-      <Text className="mt-3 text-sm text-muted-foreground">
+      <Text className="mt-3 text-sm text-muted-foreground dark:text-dark-muted-foreground">
         {course.schedule} · {course.room}
       </Text>
       <ProgressBar value={course.progress} />
@@ -36,7 +36,7 @@ export function CourseCard({ course, isTablet }: CourseCardProps) {
         <ActionButton icon={MessageSquare} label="Chat" />
         <ActionButton icon={FileText} label="Materials" />
       </View>
-      <Text className="mt-3 text-xs font-semibold text-muted-foreground">
+      <Text className="mt-3 text-xs font-semibold text-muted-foreground dark:text-dark-muted-foreground">
         {course.materials} materials · {course.unreadMessages} unread messages
       </Text>
     </View>

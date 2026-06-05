@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Pressable, Text, TextInput, View } from "react-native";
+import { useColorScheme } from "nativewind";
 
 import { SimpleRow } from "@/components/cards/SimpleRow";
 import { Section } from "@/components/common/Section";
@@ -14,16 +15,17 @@ type MoreScreenProps = {
 };
 
 export function MoreScreen({ role, setRole, onSignOut, isTablet }: MoreScreenProps) {
+  const { colorScheme, setColorScheme } = useColorScheme();
   const [pushEnabled, setPushEnabled] = useState(true);
   const [offlineEnabled, setOfflineEnabled] = useState(true);
-  const [darkTheme, setDarkTheme] = useState(false);
+  const isDarkTheme = colorScheme === "dark";
 
   return (
     <View>
       <Section title="Profile" action="Account" />
-      <View className="rounded-xl bg-card p-4 shadow-sm">
-        <Text className="text-xl font-bold text-foreground">{profile.name}</Text>
-        <Text className="mt-1 text-sm text-muted-foreground">{profile.email}</Text>
+      <View className="rounded-xl bg-card dark:bg-dark-card p-4 shadow-sm">
+        <Text className="text-xl font-bold text-foreground dark:text-dark-foreground">{profile.name}</Text>
+        <Text className="mt-1 text-sm text-muted-foreground dark:text-dark-muted-foreground">{profile.email}</Text>
         <Text className="mt-3 text-xs font-bold uppercase text-brand-600">
           {profile.organization} · {role}
         </Text>
@@ -33,7 +35,12 @@ export function MoreScreen({ role, setRole, onSignOut, isTablet }: MoreScreenPro
       <View className={isTablet ? "flex-row flex-wrap gap-3" : "gap-3"}>
         <SettingRow label="Push notifications" value={pushEnabled} onChange={setPushEnabled} isTablet={isTablet} />
         <SettingRow label="Offline basics" value={offlineEnabled} onChange={setOfflineEnabled} isTablet={isTablet} />
-        <SettingRow label="Dark theme" value={darkTheme} onChange={setDarkTheme} isTablet={isTablet} />
+        <SettingRow
+          label="Dark theme"
+          value={isDarkTheme}
+          onChange={(enabled) => setColorScheme(enabled ? "dark" : "light")}
+          isTablet={isTablet}
+        />
       </View>
 
       <Section title="Role access" />
@@ -41,10 +48,10 @@ export function MoreScreen({ role, setRole, onSignOut, isTablet }: MoreScreenPro
         {roleOptions.map((option) => (
           <Pressable
             key={option}
-            className={`flex-1 rounded-md px-3 py-3 ${role === option ? "bg-brand-500" : "bg-card"}`}
+            className={`flex-1 rounded-md px-3 py-3 ${role === option ? "bg-brand-500" : "bg-card dark:bg-dark-card"}`}
             onPress={() => setRole(option)}
           >
-            <Text className={`text-center text-xs font-bold uppercase ${role === option ? "text-white" : "text-muted-foreground"}`}>
+            <Text className={`text-center text-xs font-bold uppercase ${role === option ? "text-white" : "text-muted-foreground dark:text-dark-muted-foreground"}`}>
               {option}
             </Text>
           </Pressable>
@@ -53,16 +60,16 @@ export function MoreScreen({ role, setRole, onSignOut, isTablet }: MoreScreenPro
 
       <Section title="Search" action="Courses · Messages · Resources" />
       <TextInput
-        className="rounded-xl border border-border bg-card px-4 py-3 text-base text-foreground"
+        className="rounded-xl border border-border dark:border-dark-border bg-card dark:bg-dark-card px-4 py-3 text-base text-foreground dark:text-dark-foreground"
         placeholder="Search Eduverse"
-        placeholderTextColor="#94a3b8"
+        placeholderTextColor={isDarkTheme ? "#a1a1aa" : "#94a3b8"}
       />
 
       <Section title="Security" />
       <SimpleRow title="Password and account" meta="Reset password, manage sessions, and review account access." trailing="Soon" />
 
-      <Pressable className="mt-6 rounded-md border border-red-200 bg-red-50 px-4 py-4" onPress={onSignOut}>
-        <Text className="text-center text-base font-bold text-red-600">Sign out</Text>
+      <Pressable className="mt-6 rounded-md border border-red-200 bg-red-50 px-4 py-4 dark:border-red-900 dark:bg-red-950" onPress={onSignOut}>
+        <Text className="text-center text-base font-bold text-red-600 dark:text-red-300">Sign out</Text>
       </Pressable>
     </View>
   );

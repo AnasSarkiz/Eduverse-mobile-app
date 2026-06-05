@@ -13,18 +13,18 @@ export function ChatScreen({ isTablet }: { isTablet: boolean }) {
         {chatThreads.map((thread) => (
           <View
             key={thread.id}
-            className="rounded-xl border border-border bg-card p-4 shadow-sm"
+            className="rounded-xl border border-border dark:border-dark-border bg-card dark:bg-dark-card p-4 shadow-sm"
             style={{ width: isTablet ? "48.5%" : "100%" }}
           >
             <View className="flex-row items-start justify-between gap-3">
               <View className="flex-1">
-                <Text className="text-base font-bold text-foreground">{thread.title}</Text>
-                <Text className="mt-1 text-xs font-semibold uppercase text-muted-foreground">{thread.subtitle}</Text>
+                <Text className="text-base font-bold text-foreground dark:text-dark-foreground">{thread.title}</Text>
+                <Text className="mt-1 text-xs font-semibold uppercase text-muted-foreground dark:text-dark-muted-foreground">{thread.subtitle}</Text>
               </View>
               {thread.unread > 0 ? <Badge label={String(thread.unread)} /> : null}
             </View>
-            <Text className="mt-3 text-sm leading-5 text-muted-foreground">{thread.lastMessage}</Text>
-            <Text className="mt-3 text-xs font-semibold text-muted-foreground">{thread.time}</Text>
+            <Text className="mt-3 text-sm leading-5 text-muted-foreground dark:text-dark-muted-foreground">{thread.lastMessage}</Text>
+            <Text className="mt-3 text-xs font-semibold text-muted-foreground dark:text-dark-muted-foreground">{thread.time}</Text>
           </View>
         ))}
       </View>

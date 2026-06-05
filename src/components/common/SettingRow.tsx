@@ -1,4 +1,5 @@
 import { Switch, Text, View } from "react-native";
+import { useColorScheme } from "nativewind";
 
 type SettingRowProps = {
   label: string;
@@ -8,13 +9,22 @@ type SettingRowProps = {
 };
 
 export function SettingRow({ label, value, onChange, isTablet }: SettingRowProps) {
+  const { colorScheme } = useColorScheme();
+  const thumbColor = value ? "#ffffff" : colorScheme === "dark" ? "#a1a1aa" : "#f4f4f5";
+
   return (
     <View
-      className="flex-row items-center justify-between rounded-xl border border-border bg-card p-4 shadow-sm"
+      className="flex-row items-center justify-between rounded-xl border border-border dark:border-dark-border bg-card dark:bg-dark-card p-4 shadow-sm"
       style={{ width: isTablet ? "31.5%" : "100%" }}
     >
-      <Text className="mr-3 flex-1 text-base font-bold text-foreground">{label}</Text>
-      <Switch onValueChange={onChange} value={value} />
+      <Text className="mr-3 flex-1 text-base font-bold text-foreground dark:text-dark-foreground">{label}</Text>
+      <Switch
+        ios_backgroundColor={colorScheme === "dark" ? "#2a2d3d" : "#e4e4e7"}
+        onValueChange={onChange}
+        thumbColor={thumbColor}
+        trackColor={{ false: colorScheme === "dark" ? "#2a2d3d" : "#e4e4e7", true: "#4f46e5" }}
+        value={value}
+      />
     </View>
   );
 }

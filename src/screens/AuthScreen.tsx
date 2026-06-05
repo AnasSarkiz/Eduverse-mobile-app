@@ -31,7 +31,7 @@ export function AuthScreen({ authMode, contentPadding, isCompact, onAuthenticate
         <View className="flex-1 justify-center py-8">
           <View className="mb-8">
             <View className="mb-5 flex-row items-center gap-3">
-              <View className="h-11 w-11 items-center justify-center rounded-xl bg-card">
+              <View className="h-11 w-11 items-center justify-center rounded-xl bg-card dark:bg-dark-card">
                 <GraduationCap color="#4f46e5" size={22} strokeWidth={2.4} />
               </View>
               <Text className="text-base font-bold text-white">Eduverse</Text>
@@ -45,8 +45,8 @@ export function AuthScreen({ authMode, contentPadding, isCompact, onAuthenticate
             </Text>
           </View>
 
-          <View className="rounded-xl bg-card p-5 shadow-sm">
-            <View className="mb-5 flex-row rounded-md bg-muted p-1">
+          <View className="rounded-xl bg-card dark:bg-dark-card p-5 shadow-sm">
+            <View className="mb-5 flex-row rounded-md bg-muted dark:bg-dark-muted p-1">
               <Segment label="Login" isActive={authMode === "login"} onPress={() => setAuthMode("login")} />
               <Segment label="Signup" isActive={authMode === "signup"} onPress={() => setAuthMode("signup")} />
               <Segment label="Forgot" isActive={authMode === "forgot"} onPress={() => setAuthMode("forgot")} />
@@ -62,7 +62,7 @@ export function AuthScreen({ authMode, contentPadding, isCompact, onAuthenticate
               </Text>
             </Pressable>
 
-            <Text className="mt-4 text-center text-xs leading-5 text-muted-foreground">
+            <Text className="mt-4 text-center text-xs leading-5 text-muted-foreground dark:text-dark-muted-foreground">
               Supabase auth, organization selection, and role-based access match the web app flow.
             </Text>
           </View>

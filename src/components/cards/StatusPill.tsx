@@ -3,10 +3,10 @@ import { Text, View } from "react-native";
 import type { Assignment } from "@/data/mobileMvp";
 
 const statusClassNames: Record<Assignment["status"], { bg: string; text: string }> = {
-  graded: { bg: "bg-emerald-100", text: "text-emerald-700" },
-  overdue: { bg: "bg-red-100", text: "text-red-700" },
-  pending: { bg: "bg-amber-100", text: "text-amber-700" },
-  submitted: { bg: "bg-indigo-100", text: "text-indigo-700" }
+  graded: { bg: "bg-emerald-100 dark:bg-emerald-900", text: "text-emerald-700 dark:text-emerald-300" },
+  overdue: { bg: "bg-red-100 dark:bg-red-950", text: "text-red-700 dark:text-red-300" },
+  pending: { bg: "bg-amber-100 dark:bg-amber-900", text: "text-amber-700 dark:text-amber-300" },
+  submitted: { bg: "bg-indigo-100 dark:bg-indigo-950", text: "text-indigo-700 dark:text-indigo-300" }
 };
 
 export function StatusPill({ status }: { status: Assignment["status"] }) {

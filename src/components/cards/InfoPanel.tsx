@@ -9,10 +9,10 @@ type InfoPanelProps = {
 
 export function InfoPanel({ title, meta, value, isFluid }: InfoPanelProps) {
   return (
-    <View className="rounded-xl border border-border bg-card p-4 shadow-sm" style={{ flex: isFluid ? 1 : undefined }}>
+    <View className="rounded-xl border border-border dark:border-dark-border bg-card dark:bg-dark-card p-4 shadow-sm" style={{ flex: isFluid ? 1 : undefined }}>
       <Text className="text-xs font-bold uppercase text-brand-600">{value}</Text>
-      <Text className="mt-1 text-base font-bold text-foreground">{title}</Text>
-      <Text className="mt-1 text-sm leading-5 text-muted-foreground">{meta}</Text>
+      <Text className="mt-1 text-base font-bold text-foreground dark:text-dark-foreground">{title}</Text>
+      <Text className="mt-1 text-sm leading-5 text-muted-foreground dark:text-dark-muted-foreground">{meta}</Text>
     </View>
   );
 }

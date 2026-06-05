@@ -28,14 +28,14 @@ const iconColorByTone: Record<Metric["tone"], string> = {
 
 export function MetricCard({ label, value, tone, icon: Icon, isTablet }: MetricCardProps) {
   return (
-    <View className="rounded-xl border border-border bg-card p-4 shadow-sm" style={{ width: isTablet ? "23.5%" : "100%" }}>
+    <View className="rounded-xl border border-border dark:border-dark-border bg-card dark:bg-dark-card p-4 shadow-sm" style={{ width: isTablet ? "23.5%" : "100%" }}>
       <View className="flex-row items-center gap-3">
         <View className={`h-9 w-9 items-center justify-center rounded-lg ${toneClassNames[tone]}`}>
           <Icon color={iconColorByTone[tone]} size={18} strokeWidth={2.3} />
         </View>
         <View className="min-w-0 flex-1">
-          <Text className="text-xs text-muted-foreground">{label}</Text>
-          <Text className="mt-0.5 text-xl font-bold text-foreground">{value}</Text>
+          <Text className="text-xs text-muted-foreground dark:text-dark-muted-foreground">{label}</Text>
+          <Text className="mt-0.5 text-xl font-bold text-foreground dark:text-dark-foreground">{value}</Text>
         </View>
       </View>
     </View>
