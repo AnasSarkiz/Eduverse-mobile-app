@@ -12,6 +12,7 @@ pnpm-lock.yaml
 .DS_Store
 .env
 .env.*
+!.env.example
 
 npm-debug.*
 yarn-debug.*

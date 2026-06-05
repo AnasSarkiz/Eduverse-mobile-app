@@ -1,16 +1,25 @@
-import { Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 
 import { StatusPill } from "@/components/cards/StatusPill";
-import type { Assignment } from "@/data/mobileMvp";
 
-type AssignmentCardProps = {
-  assignment: Assignment;
-  isTablet: boolean;
+type AssignmentCardItem = {
+  id: string;
+  courseCode: string;
+  dueLabel: string;
+  score?: string;
+  status: "pending" | "submitted" | "graded" | "overdue";
+  title: string;
 };
 
-export function AssignmentCard({ assignment, isTablet }: AssignmentCardProps) {
+type AssignmentCardProps = {
+  assignment: AssignmentCardItem;
+  isTablet: boolean;
+  onPress?: () => void;
+};
+
+export function AssignmentCard({ assignment, isTablet, onPress }: AssignmentCardProps) {
   return (
-    <View className="rounded-xl border border-border dark:border-dark-border bg-card dark:bg-dark-card p-4 shadow-sm" style={{ width: isTablet ? "48.5%" : "100%" }}>
+    <Pressable className="rounded-xl border border-border dark:border-dark-border bg-card dark:bg-dark-card p-4 shadow-sm" onPress={onPress} style={{ width: isTablet ? "48.5%" : "100%" }}>
       <View className="flex-row items-start justify-between gap-3">
         <View className="flex-1">
           <Text className="text-xs font-bold uppercase text-brand-600">{assignment.courseCode}</Text>
@@ -20,6 +29,6 @@ export function AssignmentCard({ assignment, isTablet }: AssignmentCardProps) {
       </View>
       <Text className="mt-3 text-sm text-muted-foreground dark:text-dark-muted-foreground">{assignment.dueLabel}</Text>
       {assignment.score ? <Text className="mt-2 text-sm font-bold text-emerald-600">Score {assignment.score}</Text> : null}
-    </View>
+    </Pressable>
   );
 }

@@ -1,11 +1,19 @@
-import { Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 
 import { Badge } from "@/components/common/Badge";
-import type { NotificationItem } from "@/data/mobileMvp";
 
-export function NotificationRow({ item }: { item: NotificationItem }) {
+type NotificationRowItem = {
+  id: string;
+  title: string;
+  body: string;
+  category: "course" | "message" | "deadline" | "announcement";
+  time: string;
+  unread: boolean;
+};
+
+export function NotificationRow({ item, onPress }: { item: NotificationRowItem; onPress?: () => void }) {
   return (
-    <View className="mb-3 rounded-xl border border-border dark:border-dark-border bg-card dark:bg-dark-card p-4 shadow-sm">
+    <Pressable className="mb-3 rounded-xl border border-border dark:border-dark-border bg-card dark:bg-dark-card p-4 shadow-sm" onPress={onPress}>
       <View className="flex-row items-start justify-between gap-3">
         <View className="flex-1">
           <Text className="text-base font-bold text-foreground dark:text-dark-foreground">{item.title}</Text>
@@ -16,6 +24,6 @@ export function NotificationRow({ item }: { item: NotificationItem }) {
       <Text className="mt-2 text-xs font-semibold uppercase text-muted-foreground dark:text-dark-muted-foreground">
         {item.category} · {item.time}
       </Text>
-    </View>
+    </Pressable>
   );
 }

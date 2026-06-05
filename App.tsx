@@ -1,13 +1,13 @@
 import "./global.css";
 
 import { useMemo, useState } from "react";
-import { ScrollView, useWindowDimensions, View } from "react-native";
+import { ActivityIndicator, ScrollView, Text, useWindowDimensions, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Bell, BookOpen, CheckCircle2, Clock, LayoutDashboard, MessageSquare, MoreHorizontal, TrendingUp } from "lucide-react-native";
 
 import { BottomTabs } from "@/components/layout/BottomTabs";
 import { AppHeader } from "@/components/layout/AppHeader";
-import { assignments, courses, notifications, profile, type UserRole } from "@/data/mobileMvp";
+import { EduverseProvider, useEduverse } from "@/providers/EduverseProvider";
 import { AuthScreen } from "@/screens/AuthScreen";
 import { ChatScreen } from "@/screens/ChatScreen";
 import { CoursesScreen } from "@/screens/CoursesScreen";
@@ -25,11 +25,30 @@ const tabs: TabItem[] = [
 ];
 
 export default function App() {
+  return (
+    <EduverseProvider>
+      <AppContent />
+    </EduverseProvider>
+  );
+}
+
+function AppContent() {
+  const {
+    assignments,
+    classes,
+    errorMessage,
+    forgotPassword,
+    isAuthenticated,
+    isLoading,
+    notifications,
+    signIn,
+    signOutUser,
+    signUp,
+    user
+  } = useEduverse();
   const { width } = useWindowDimensions();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [authMode, setAuthMode] = useState<AuthMode>("login");
   const [activeTab, setActiveTab] = useState<ScreenKey>("dashboard");
-  const [role, setRole] = useState<UserRole>(profile.role);
   const isCompact = width < 360;
   const isTablet = width >= 768;
   const contentPadding = isCompact ? 14 : isTablet ? 28 : 20;
@@ -37,27 +56,27 @@ export default function App() {
 
   const stats = useMemo(
     () => [
-      { label: "Classes", value: String(courses.length), tone: "indigo" as const, icon: BookOpen },
+      { label: "Classes", value: String(classes.length), tone: "indigo" as const, icon: BookOpen },
       {
         label: "Pending",
-        value: String(assignments.filter((assignment) => ["pending", "overdue"].includes(assignment.status)).length),
+        value: String(assignments.filter((assignment) => !assignment.mySubmission).length),
         tone: "amber" as const,
         icon: Clock
       },
       {
         label: "Unread",
-        value: String(notifications.filter((item) => item.unread).length),
+        value: String(notifications.filter((item) => !item.readAt).length),
         tone: "emerald" as const,
         icon: Bell
       },
       {
         label: "Progress",
-        value: `${Math.round(courses.reduce((sum, course) => sum + course.progress, 0) / courses.length)}%`,
+        value: `${getCompletion(assignments)}%`,
         tone: "violet" as const,
         icon: TrendingUp
       }
     ],
-    []
+    [assignments, classes.length, notifications]
   );
 
   if (!isAuthenticated) {
@@ -65,10 +84,22 @@ export default function App() {
       <AuthScreen
         authMode={authMode}
         contentPadding={contentPadding}
+        errorMessage={errorMessage}
         isCompact={isCompact}
-        onAuthenticate={() => setIsAuthenticated(true)}
+        onForgotPassword={forgotPassword}
+        onSignIn={signIn}
+        onSignUp={signUp}
         setAuthMode={setAuthMode}
       />
+    );
+  }
+
+  if (isLoading && !user) {
+    return (
+      <SafeAreaView className="flex-1 items-center justify-center bg-background dark:bg-dark-background">
+        <ActivityIndicator color="#4f46e5" />
+        <Text className="mt-3 text-sm font-semibold text-muted-foreground dark:text-dark-muted-foreground">Loading Eduverse...</Text>
+      </SafeAreaView>
     );
   }
 
@@ -86,13 +117,13 @@ export default function App() {
             width: "100%"
           }}
         >
-          <AppHeader role={role} setRole={setRole} />
+          <AppHeader />
           {activeTab === "dashboard" ? <DashboardScreen stats={stats} isTablet={isTablet} /> : null}
           {activeTab === "courses" ? <CoursesScreen isTablet={isTablet} /> : null}
           {activeTab === "tasks" ? <TasksScreen isTablet={isTablet} /> : null}
           {activeTab === "chat" ? <ChatScreen isTablet={isTablet} /> : null}
           {activeTab === "more" ? (
-            <MoreScreen role={role} setRole={setRole} onSignOut={() => setIsAuthenticated(false)} isTablet={isTablet} />
+            <MoreScreen onSignOut={signOutUser} isTablet={isTablet} />
           ) : null}
         </ScrollView>
 
@@ -100,4 +131,9 @@ export default function App() {
       </View>
     </SafeAreaView>
   );
+}
+
+function getCompletion(assignments: { mySubmission: unknown }[]) {
+  if (assignments.length === 0) return 0;
+  return Math.round((assignments.filter((assignment) => assignment.mySubmission).length / assignments.length) * 100);
 }

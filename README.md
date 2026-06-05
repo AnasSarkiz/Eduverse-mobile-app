@@ -40,6 +40,22 @@ Heavy workflows such as course creation, analytics, deep content editing, exam a
 
 ## Development
 
+Create `.env` from `.env.example` and copy the public Supabase values from the web app:
+
+```sh
+cp .env.example .env
+```
+
+Required values:
+
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+- `EXPO_PUBLIC_EDUVERSE_API_BASE_URL=https://eduverse-demo.vercel.app`
+
+The mobile app also supports `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, but you do not need to duplicate values if your `.env` already uses the `NEXT_PUBLIC_SUPABASE_*` names from the web app. `app.config.js` bridges those values into Expo runtime config for iOS and Android.
+
+Do not copy server-only web secrets into the mobile app, including `SUPABASE_SECRET_KEY`, AWS keys, or LiveKit API secrets.
+
 ```sh
 bun install
 bun run start

@@ -6,7 +6,7 @@ import { MetricCard, type Metric } from "@/components/cards/MetricCard";
 import { NotificationRow } from "@/components/cards/NotificationRow";
 import { ActionButton } from "@/components/common/ActionButton";
 import { Section } from "@/components/common/Section";
-import { assignments, courses, notifications } from "@/data/mobileMvp";
+import { useEduverse } from "@/providers/EduverseProvider";
 
 type DashboardScreenProps = {
   isTablet: boolean;
@@ -14,20 +14,20 @@ type DashboardScreenProps = {
 };
 
 export function DashboardScreen({ stats, isTablet }: DashboardScreenProps) {
-  const nextClass = courses.find((course) => course.liveNow) ?? courses[0];
-  const nextTask = assignments.find((assignment) => assignment.status !== "graded") ?? assignments[0];
+  const { activeClass, assignments, markRead, notifications, selectClass } = useEduverse();
+  const nextTask = assignments.find((assignment) => !assignment.mySubmission) ?? assignments[0] ?? null;
 
   return (
     <View>
       <Section title="Today" action="Offline cache ready" />
       <View className="rounded-xl bg-primary p-5">
         <Text className="text-sm font-bold uppercase text-indigo-100">Live or next class</Text>
-        <Text className="mt-2 text-2xl font-bold text-white">{nextClass.title}</Text>
+        <Text className="mt-2 text-2xl font-bold text-white">{activeClass?.name ?? "No active class"}</Text>
         <Text className="mt-1 text-sm text-indigo-100">
-          {nextClass.schedule} · {nextClass.room}
+          {activeClass ? `${activeClass.schedule_text ?? "No schedule"} · ${activeClass.room ?? "No room"}` : "Join or create classes from the web app."}
         </Text>
         <View className="mt-4 flex-row flex-wrap gap-2">
-          <ActionButton icon={Radio} label={nextClass.liveNow ? "Join live" : "Open class"} isPrimary />
+          <ActionButton icon={Radio} label="Open class" isPrimary onPress={() => activeClass && selectClass(activeClass.id)} />
           <ActionButton icon={FileText} label="View materials" />
         </View>
       </View>
@@ -40,14 +40,42 @@ export function DashboardScreen({ stats, isTablet }: DashboardScreenProps) {
 
       <Section title="Upcoming" action="Calendar" />
       <View className={isTablet ? "flex-row gap-3" : "gap-3"}>
-        <InfoPanel title={nextTask.title} meta={`${nextTask.courseCode} · ${nextTask.dueLabel}`} value="Assignment" isFluid={isTablet} />
-        <InfoPanel title={notifications[0].title} meta={notifications[0].body} value="Notification" isFluid={isTablet} />
+        <InfoPanel
+          title={nextTask?.title ?? "No pending assignments"}
+          meta={nextTask ? formatDate(nextTask.dueAt) : "You are all caught up."}
+          value="Assignment"
+          isFluid={isTablet}
+        />
+        <InfoPanel
+          title={notifications[0]?.title ?? "No notifications"}
+          meta={notifications[0]?.body ?? "New updates will appear here."}
+          value="Notification"
+          isFluid={isTablet}
+        />
       </View>
 
       <Section title="Recent activity" />
       {notifications.map((item) => (
-        <NotificationRow key={item.id} item={item} />
+        <NotificationRow
+          key={item.id}
+          item={{
+            id: item.id,
+            body: item.body,
+            category: item.type.includes("assignment") ? "deadline" : item.type.includes("announcement") ? "announcement" : "course",
+            time: formatDate(item.createdAt),
+            title: item.title,
+            unread: !item.readAt
+          }}
+          onPress={() => markRead(item.id)}
+        />
       ))}
+      {notifications.length === 0 ? <Text className="text-sm text-muted-foreground dark:text-dark-muted-foreground">No recent activity yet.</Text> : null}
     </View>
   );
+}
+
+function formatDate(value: string) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return date.toLocaleDateString(undefined, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
 }

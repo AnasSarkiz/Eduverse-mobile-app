@@ -1,21 +1,66 @@
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { GraduationCap } from "lucide-react-native";
+import { useState } from "react";
 
 import { FormInput } from "@/components/common/FormInput";
 import { Segment } from "@/components/common/Segment";
-import { profile } from "@/data/mobileMvp";
 import type { AuthMode } from "@/types/navigation";
 
 type AuthScreenProps = {
   authMode: AuthMode;
   contentPadding: number;
+  errorMessage: string | null;
   isCompact: boolean;
-  onAuthenticate: () => void;
+  onForgotPassword: (email: string) => Promise<void>;
+  onSignIn: (email: string, password: string) => Promise<void>;
+  onSignUp: (email: string, password: string, displayName: string) => Promise<void>;
   setAuthMode: (mode: AuthMode) => void;
 };
 
-export function AuthScreen({ authMode, contentPadding, isCompact, onAuthenticate, setAuthMode }: AuthScreenProps) {
+export function AuthScreen({
+  authMode,
+  contentPadding,
+  errorMessage,
+  isCompact,
+  onForgotPassword,
+  onSignIn,
+  onSignUp,
+  setAuthMode
+}: AuthScreenProps) {
+  const [displayName, setDisplayName] = useState("");
+  const [email, setEmail] = useState("");
+  const [feedback, setFeedback] = useState<string | null>(null);
+  const [isPending, setIsPending] = useState(false);
+  const [localError, setLocalError] = useState<string | null>(null);
+  const [password, setPassword] = useState("");
+
+  async function submit() {
+    setFeedback(null);
+    setLocalError(null);
+    setIsPending(true);
+
+    try {
+      if (authMode === "login") {
+        await onSignIn(email, password);
+        return;
+      }
+
+      if (authMode === "signup") {
+        await onSignUp(email, password, displayName);
+        setFeedback("Account created. Check your email if confirmation is enabled.");
+        return;
+      }
+
+      await onForgotPassword(email);
+      setFeedback("Password reset email sent.");
+    } catch (error) {
+      setLocalError(error instanceof Error ? error.message : "Authentication failed.");
+    } finally {
+      setIsPending(false);
+    }
+  }
+
   return (
     <SafeAreaView className="flex-1 bg-primary">
       <ScrollView
@@ -52,13 +97,31 @@ export function AuthScreen({ authMode, contentPadding, isCompact, onAuthenticate
               <Segment label="Forgot" isActive={authMode === "forgot"} onPress={() => setAuthMode("forgot")} />
             </View>
 
-            {authMode === "signup" ? <FormInput label="Full name" value={profile.name} /> : null}
-            <FormInput label="Email" value={profile.email} />
-            {authMode !== "forgot" ? <FormInput label="Password" value="password" secure /> : null}
+            {authMode === "signup" ? <FormInput label="Full name" onChangeText={setDisplayName} value={displayName} /> : null}
+            <FormInput label="Email" onChangeText={setEmail} value={email} />
+            {authMode !== "forgot" ? <FormInput label="Password" onChangeText={setPassword} secure value={password} /> : null}
 
-            <Pressable className="mt-5 rounded-md bg-brand-500 px-4 py-4" onPress={onAuthenticate}>
+            {localError || errorMessage ? (
+              <Text className="mt-2 rounded-md bg-red-50 px-3 py-2 text-sm font-semibold text-red-700 dark:bg-red-950 dark:text-red-300">
+                {localError ?? errorMessage}
+              </Text>
+            ) : null}
+
+            {feedback ? (
+              <Text className="mt-2 rounded-md bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
+                {feedback}
+              </Text>
+            ) : null}
+
+            <Pressable className="mt-5 rounded-md bg-brand-500 px-4 py-4" disabled={isPending} onPress={submit}>
               <Text className="text-center text-base font-bold text-white">
-                {authMode === "login" ? "Open Eduverse" : authMode === "signup" ? "Create account" : "Send reset link"}
+                {isPending
+                  ? "Please wait..."
+                  : authMode === "login"
+                    ? "Open Eduverse"
+                    : authMode === "signup"
+                      ? "Create account"
+                      : "Send reset link"}
               </Text>
             </Pressable>
 

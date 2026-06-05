@@ -4,14 +4,27 @@ import { BookOpen, FileText, MessageSquare, Radio } from "lucide-react-native";
 import { ActionButton } from "@/components/common/ActionButton";
 import { Badge } from "@/components/common/Badge";
 import { ProgressBar } from "@/components/cards/ProgressBar";
-import type { Course } from "@/data/mobileMvp";
 
-type CourseCardProps = {
-  course: Course;
-  isTablet: boolean;
+export type CourseCardModel = {
+  id: string;
+  code: string;
+  instructor: string;
+  liveNow?: boolean;
+  materials: number;
+  progress: number;
+  room: string;
+  schedule: string;
+  title: string;
+  unreadMessages: number;
 };
 
-export function CourseCard({ course, isTablet }: CourseCardProps) {
+type CourseCardProps = {
+  course: CourseCardModel;
+  isTablet: boolean;
+  onOpenChat?: () => void;
+};
+
+export function CourseCard({ course, isTablet, onOpenChat }: CourseCardProps) {
   return (
     <View className="rounded-xl border border-border dark:border-dark-border bg-card dark:bg-dark-card p-4 shadow-sm" style={{ width: isTablet ? "48.5%" : "100%" }}>
       <View className="flex-row items-start justify-between gap-3">
@@ -33,7 +46,7 @@ export function CourseCard({ course, isTablet }: CourseCardProps) {
       <ProgressBar value={course.progress} />
       <View className="mt-4 flex-row gap-2">
         <ActionButton icon={Radio} label="Home" />
-        <ActionButton icon={MessageSquare} label="Chat" />
+        <ActionButton icon={MessageSquare} label="Chat" onPress={onOpenChat} />
         <ActionButton icon={FileText} label="Materials" />
       </View>
       <Text className="mt-3 text-xs font-semibold text-muted-foreground dark:text-dark-muted-foreground">

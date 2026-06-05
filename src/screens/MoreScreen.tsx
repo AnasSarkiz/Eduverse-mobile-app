@@ -5,16 +5,15 @@ import { useColorScheme } from "nativewind";
 import { SimpleRow } from "@/components/cards/SimpleRow";
 import { Section } from "@/components/common/Section";
 import { SettingRow } from "@/components/common/SettingRow";
-import { profile, roleOptions, type UserRole } from "@/data/mobileMvp";
+import { useEduverse } from "@/providers/EduverseProvider";
 
 type MoreScreenProps = {
-  role: UserRole;
-  setRole: (role: UserRole) => void;
   onSignOut: () => void;
   isTablet: boolean;
 };
 
-export function MoreScreen({ role, setRole, onSignOut, isTablet }: MoreScreenProps) {
+export function MoreScreen({ onSignOut, isTablet }: MoreScreenProps) {
+  const { activeOrganization, organizations, selectOrganization, user } = useEduverse();
   const { colorScheme, setColorScheme } = useColorScheme();
   const [pushEnabled, setPushEnabled] = useState(true);
   const [offlineEnabled, setOfflineEnabled] = useState(true);
@@ -24,10 +23,10 @@ export function MoreScreen({ role, setRole, onSignOut, isTablet }: MoreScreenPro
     <View>
       <Section title="Profile" action="Account" />
       <View className="rounded-xl bg-card dark:bg-dark-card p-4 shadow-sm">
-        <Text className="text-xl font-bold text-foreground dark:text-dark-foreground">{profile.name}</Text>
-        <Text className="mt-1 text-sm text-muted-foreground dark:text-dark-muted-foreground">{profile.email}</Text>
+        <Text className="text-xl font-bold text-foreground dark:text-dark-foreground">{user?.name ?? "Eduverse user"}</Text>
+        <Text className="mt-1 text-sm text-muted-foreground dark:text-dark-muted-foreground">{user?.email ?? ""}</Text>
         <Text className="mt-3 text-xs font-bold uppercase text-brand-600">
-          {profile.organization} · {role}
+          {activeOrganization?.name ?? user?.institution ?? "No organization"} · {user?.role ?? "student"}
         </Text>
       </View>
 
@@ -43,20 +42,26 @@ export function MoreScreen({ role, setRole, onSignOut, isTablet }: MoreScreenPro
         />
       </View>
 
-      <Section title="Role access" />
+      <Section title="Organizations" />
       <View className="flex-row gap-2">
-        {roleOptions.map((option) => (
+        {organizations.slice(0, 3).map((organization) => (
           <Pressable
-            key={option}
-            className={`flex-1 rounded-md px-3 py-3 ${role === option ? "bg-brand-500" : "bg-card dark:bg-dark-card"}`}
-            onPress={() => setRole(option)}
+            key={organization.id}
+            className={`flex-1 rounded-md px-3 py-3 ${activeOrganization?.id === organization.id ? "bg-brand-500" : "bg-card dark:bg-dark-card"}`}
+            onPress={() => selectOrganization(organization.id)}
           >
-            <Text className={`text-center text-xs font-bold uppercase ${role === option ? "text-white" : "text-muted-foreground dark:text-dark-muted-foreground"}`}>
-              {option}
+            <Text
+              className={`text-center text-xs font-bold uppercase ${
+                activeOrganization?.id === organization.id ? "text-white" : "text-muted-foreground dark:text-dark-muted-foreground"
+              }`}
+              numberOfLines={1}
+            >
+              {organization.name}
             </Text>
           </Pressable>
         ))}
       </View>
+      {organizations.length === 0 ? <Text className="text-sm text-muted-foreground dark:text-dark-muted-foreground">No organizations found for this account.</Text> : null}
 
       <Section title="Search" action="Courses · Messages · Resources" />
       <TextInput
