@@ -8,12 +8,12 @@ type SimpleRowProps = {
 
 export function SimpleRow({ title, meta, trailing }: SimpleRowProps) {
   return (
-    <View className="mb-3 flex-row items-start justify-between gap-3 rounded-lg border border-slate-200 bg-white p-4">
+    <View className="mb-3 flex-row items-start justify-between gap-3 rounded-xl border border-border bg-card p-4 shadow-sm">
       <View className="flex-1">
-        <Text className="text-base font-bold text-ink">{title}</Text>
-        <Text className="mt-1 text-sm leading-5 text-slate-600">{meta}</Text>
+        <Text className="text-base font-bold text-foreground">{title}</Text>
+        <Text className="mt-1 text-sm leading-5 text-muted-foreground">{meta}</Text>
       </View>
-      <Text className="text-xs font-bold uppercase text-slate-400">{trailing}</Text>
+      <Text className="text-xs font-bold uppercase text-muted-foreground">{trailing}</Text>
     </View>
   );
 }

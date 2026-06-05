@@ -1,4 +1,5 @@
 import { Text, View } from "react-native";
+import { BookOpen, FileText, MessageSquare, Radio } from "lucide-react-native";
 
 import { ActionButton } from "@/components/common/ActionButton";
 import { Badge } from "@/components/common/Badge";
@@ -12,25 +13,30 @@ type CourseCardProps = {
 
 export function CourseCard({ course, isTablet }: CourseCardProps) {
   return (
-    <View className="rounded-lg border border-slate-200 bg-white p-4" style={{ width: isTablet ? "48.5%" : "100%" }}>
+    <View className="rounded-xl border border-border bg-card p-4 shadow-sm" style={{ width: isTablet ? "48.5%" : "100%" }}>
       <View className="flex-row items-start justify-between gap-3">
-        <View className="flex-1">
-          <Text className="text-xs font-bold uppercase text-brand-600">{course.code}</Text>
-          <Text className="mt-1 text-lg font-bold text-ink">{course.title}</Text>
-          <Text className="mt-1 text-sm text-slate-500">{course.instructor}</Text>
+        <View className="flex-1 flex-row gap-3">
+          <View className="h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-500">
+            <BookOpen color="#ffffff" size={18} strokeWidth={2.4} />
+          </View>
+          <View className="flex-1">
+            <Text className="text-xs font-bold uppercase text-brand-600">{course.code}</Text>
+            <Text className="mt-1 text-base font-bold text-foreground">{course.title}</Text>
+            <Text className="mt-1 text-sm text-muted-foreground">{course.instructor}</Text>
+          </View>
         </View>
         {course.liveNow ? <Badge label="Live" /> : null}
       </View>
-      <Text className="mt-3 text-sm text-slate-600">
+      <Text className="mt-3 text-sm text-muted-foreground">
         {course.schedule} · {course.room}
       </Text>
       <ProgressBar value={course.progress} />
       <View className="mt-4 flex-row gap-2">
-        <ActionButton label="Home" />
-        <ActionButton label="Chat" />
-        <ActionButton label="Materials" />
+        <ActionButton icon={Radio} label="Home" />
+        <ActionButton icon={MessageSquare} label="Chat" />
+        <ActionButton icon={FileText} label="Materials" />
       </View>
-      <Text className="mt-3 text-xs font-semibold text-slate-400">
+      <Text className="mt-3 text-xs font-semibold text-muted-foreground">
         {course.materials} materials · {course.unreadMessages} unread messages
       </Text>
     </View>

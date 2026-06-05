@@ -21,9 +21,9 @@ export function MoreScreen({ role, setRole, onSignOut, isTablet }: MoreScreenPro
   return (
     <View>
       <Section title="Profile" action="Account" />
-      <View className="rounded-lg bg-white p-4">
-        <Text className="text-xl font-bold text-ink">{profile.name}</Text>
-        <Text className="mt-1 text-sm text-slate-500">{profile.email}</Text>
+      <View className="rounded-xl bg-card p-4 shadow-sm">
+        <Text className="text-xl font-bold text-foreground">{profile.name}</Text>
+        <Text className="mt-1 text-sm text-muted-foreground">{profile.email}</Text>
         <Text className="mt-3 text-xs font-bold uppercase text-brand-600">
           {profile.organization} · {role}
         </Text>
@@ -41,10 +41,10 @@ export function MoreScreen({ role, setRole, onSignOut, isTablet }: MoreScreenPro
         {roleOptions.map((option) => (
           <Pressable
             key={option}
-            className={`flex-1 rounded-md px-3 py-3 ${role === option ? "bg-brand-500" : "bg-white"}`}
+            className={`flex-1 rounded-md px-3 py-3 ${role === option ? "bg-brand-500" : "bg-card"}`}
             onPress={() => setRole(option)}
           >
-            <Text className={`text-center text-xs font-bold uppercase ${role === option ? "text-white" : "text-slate-500"}`}>
+            <Text className={`text-center text-xs font-bold uppercase ${role === option ? "text-white" : "text-muted-foreground"}`}>
               {option}
             </Text>
           </Pressable>
@@ -53,7 +53,7 @@ export function MoreScreen({ role, setRole, onSignOut, isTablet }: MoreScreenPro
 
       <Section title="Search" action="Courses · Messages · Resources" />
       <TextInput
-        className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-base text-ink"
+        className="rounded-xl border border-border bg-card px-4 py-3 text-base text-foreground"
         placeholder="Search Eduverse"
         placeholderTextColor="#94a3b8"
       />

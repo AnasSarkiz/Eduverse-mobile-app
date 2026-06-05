@@ -13,18 +13,18 @@ export function ChatScreen({ isTablet }: { isTablet: boolean }) {
         {chatThreads.map((thread) => (
           <View
             key={thread.id}
-            className="rounded-lg border border-slate-200 bg-white p-4"
+            className="rounded-xl border border-border bg-card p-4 shadow-sm"
             style={{ width: isTablet ? "48.5%" : "100%" }}
           >
             <View className="flex-row items-start justify-between gap-3">
               <View className="flex-1">
-                <Text className="text-base font-bold text-ink">{thread.title}</Text>
-                <Text className="mt-1 text-xs font-semibold uppercase text-slate-400">{thread.subtitle}</Text>
+                <Text className="text-base font-bold text-foreground">{thread.title}</Text>
+                <Text className="mt-1 text-xs font-semibold uppercase text-muted-foreground">{thread.subtitle}</Text>
               </View>
               {thread.unread > 0 ? <Badge label={String(thread.unread)} /> : null}
             </View>
-            <Text className="mt-3 text-sm leading-5 text-slate-600">{thread.lastMessage}</Text>
-            <Text className="mt-3 text-xs font-semibold text-slate-400">{thread.time}</Text>
+            <Text className="mt-3 text-sm leading-5 text-muted-foreground">{thread.lastMessage}</Text>
+            <Text className="mt-3 text-xs font-semibold text-muted-foreground">{thread.time}</Text>
           </View>
         ))}
       </View>

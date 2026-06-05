@@ -1,4 +1,5 @@
 import { Text, View } from "react-native";
+import { FileText, Radio } from "lucide-react-native";
 
 import { InfoPanel } from "@/components/cards/InfoPanel";
 import { MetricCard, type Metric } from "@/components/cards/MetricCard";
@@ -19,15 +20,15 @@ export function DashboardScreen({ stats, isTablet }: DashboardScreenProps) {
   return (
     <View>
       <Section title="Today" action="Offline cache ready" />
-      <View className="rounded-lg bg-ink p-5">
-        <Text className="text-sm font-bold uppercase text-cyan-200">Live or next class</Text>
+      <View className="rounded-xl bg-primary p-5">
+        <Text className="text-sm font-bold uppercase text-indigo-100">Live or next class</Text>
         <Text className="mt-2 text-2xl font-bold text-white">{nextClass.title}</Text>
-        <Text className="mt-1 text-sm text-slate-300">
+        <Text className="mt-1 text-sm text-indigo-100">
           {nextClass.schedule} · {nextClass.room}
         </Text>
         <View className="mt-4 flex-row flex-wrap gap-2">
-          <ActionButton label={nextClass.liveNow ? "Join live" : "Open class"} isPrimary />
-          <ActionButton label="View materials" />
+          <ActionButton icon={Radio} label={nextClass.liveNow ? "Join live" : "Open class"} isPrimary />
+          <ActionButton icon={FileText} label="View materials" />
         </View>
       </View>
 

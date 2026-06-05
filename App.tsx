@@ -3,6 +3,7 @@ import "./global.css";
 import { useMemo, useState } from "react";
 import { ScrollView, useWindowDimensions, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Bell, BookOpen, CheckCircle2, Clock, LayoutDashboard, MessageSquare, MoreHorizontal, TrendingUp } from "lucide-react-native";
 
 import { BottomTabs } from "@/components/layout/BottomTabs";
 import { AppHeader } from "@/components/layout/AppHeader";
@@ -16,11 +17,11 @@ import { TasksScreen } from "@/screens/TasksScreen";
 import type { AuthMode, ScreenKey, TabItem } from "@/types/navigation";
 
 const tabs: TabItem[] = [
-  { key: "dashboard", label: "Today", icon: "T" },
-  { key: "courses", label: "Classes", icon: "C" },
-  { key: "tasks", label: "Tasks", icon: "D" },
-  { key: "chat", label: "Chat", icon: "M" },
-  { key: "more", label: "More", icon: "+" }
+  { key: "dashboard", label: "Today", icon: LayoutDashboard },
+  { key: "courses", label: "Classes", icon: BookOpen },
+  { key: "tasks", label: "Tasks", icon: CheckCircle2 },
+  { key: "chat", label: "Chat", icon: MessageSquare },
+  { key: "more", label: "More", icon: MoreHorizontal }
 ];
 
 export default function App() {
@@ -36,17 +37,24 @@ export default function App() {
 
   const stats = useMemo(
     () => [
-      { label: "Classes", value: String(courses.length), tone: "cyan" as const },
+      { label: "Classes", value: String(courses.length), tone: "indigo" as const, icon: BookOpen },
       {
         label: "Pending",
         value: String(assignments.filter((assignment) => ["pending", "overdue"].includes(assignment.status)).length),
-        tone: "amber" as const
+        tone: "amber" as const,
+        icon: Clock
       },
-      { label: "Unread", value: String(notifications.filter((item) => item.unread).length), tone: "emerald" as const },
+      {
+        label: "Unread",
+        value: String(notifications.filter((item) => item.unread).length),
+        tone: "emerald" as const,
+        icon: Bell
+      },
       {
         label: "Progress",
         value: `${Math.round(courses.reduce((sum, course) => sum + course.progress, 0) / courses.length)}%`,
-        tone: "violet" as const
+        tone: "violet" as const,
+        icon: TrendingUp
       }
     ],
     []
@@ -65,7 +73,7 @@ export default function App() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-slate-50">
+    <SafeAreaView className="flex-1 bg-background">
       <View className="flex-1">
         <ScrollView
           className="flex-1"

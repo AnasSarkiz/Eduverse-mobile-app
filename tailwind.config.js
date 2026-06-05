@@ -6,13 +6,22 @@ module.exports = {
     extend: {
       colors: {
         brand: {
-          50: "#ecfeff",
-          100: "#cffafe",
-          500: "#06b6d4",
-          600: "#0891b2",
-          900: "#164e63"
+          50: "#eef2ff",
+          100: "#e0e7ff",
+          500: "#4f46e5",
+          600: "#4338ca",
+          700: "#3730a3",
+          900: "#312e81"
         },
-        ink: "#172033"
+        background: "#fcfcfc",
+        border: "#e4e4e7",
+        card: "#ffffff",
+        foreground: "#18181b",
+        ink: "#18181b",
+        muted: "#f4f4f5",
+        "muted-foreground": "#71717a",
+        sidebar: "#f8f8fb",
+        "brand-subtle": "#eef2ff"
       }
     }
   },
