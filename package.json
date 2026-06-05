@@ -2,6 +2,9 @@
   "name": "eduverse-mobile-app",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=22 <23"
+  },
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
     "start": "expo start",
@@ -13,17 +16,19 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "expo": "~56.0.0",
+    "expo": "~54.0.0",
     "nativewind": "^4.1.23",
-    "react": "19.2.0",
-    "react-native": "0.85.0",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "react-native": "0.81.0",
     "react-native-reanimated": "~4.1.1",
-    "react-native-safe-area-context": "~5.6.0"
+    "react-native-safe-area-context": "~5.6.0",
+    "react-native-web": "^0.21.0"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
-    "@types/react": "~19.2.0",
-    "babel-preset-expo": "~56.0.0",
+    "@types/react": "~19.1.0",
+    "babel-preset-expo": "~54.0.0",
     "prettier-plugin-tailwindcss": "^0.5.11",
     "tailwindcss": "^3.4.17",
     "typescript": "~5.9.2"

@@ -9,6 +9,8 @@ Supporting mobile app for Eduverse, focused on the daily student and teacher wor
 - NativeWind / Tailwind CSS
 - Bun for dependency installation
 
+The project targets Expo SDK 54 so it works with the Expo Go 54 app currently available on iOS.
+
 ## First MVP Scope
 
 1. Auth and profile
@@ -45,6 +47,8 @@ bun run start
 
 Use the Expo CLI prompt to launch iOS, Android, or web.
 
+Use Node 22 LTS for this project. Expo/Metro can crash or be killed on very new non-LTS Node versions.
+
 ## Test on Real Devices
 
 Install Expo Go on the phone first:
@@ -59,6 +63,24 @@ bun run start:tunnel
 ```
 
 Scan the QR code with the iPhone Camera app or the Expo Go scanner on Android. Use `bun run start:clear` if Metro gets stuck with old cache.
+
+## Troubleshooting
+
+If `bun run start` exits with `SIGKILL` or `zsh: killed`, check Node:
+
+```sh
+node --version
+```
+
+If it shows Node 25 or another non-LTS version, switch to Node 22 LTS, reinstall dependencies, then start again:
+
+```sh
+brew install node@22
+brew link node@22 --force --overwrite
+node --version
+bun install
+bun run start:clear
+```
 
 ## Responsive Targets
 
