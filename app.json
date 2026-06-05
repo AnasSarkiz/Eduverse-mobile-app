@@ -1,0 +1,25 @@
+{
+  "expo": {
+    "name": "Eduverse Mobile",
+    "slug": "eduverse-mobile-app",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "scheme": "eduverse",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "splash": {
+      "backgroundColor": "#f8fafc"
+    },
+    "ios": {
+      "bundleIdentifier": "com.eduverse.mobile",
+      "supportsTablet": true
+    },
+    "android": {
+      "edgeToEdgeEnabled": true,
+      "package": "com.eduverse.mobile"
+    },
+    "web": {
+      "bundler": "metro"
+    }
+  }
+}
