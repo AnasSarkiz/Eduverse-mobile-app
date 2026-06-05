@@ -20,6 +20,22 @@ Supporting mobile app for Eduverse, focused on the daily student and teacher wor
 7. Announcements
 8. Settings
 
+## Mobile Product Direction
+
+The mobile app should be the daily companion for Eduverse, not the admin console. It focuses on fast student/teacher workflows:
+
+- auth, signup, forgot password, profile, organization role context
+- notifications for course updates, chats, deadlines, and announcements
+- dashboard with upcoming tasks, enrolled classes, recent activity, and progress
+- course/class overview with live session entry, materials, chat, assignments, and results shortcuts
+- assignments and deadlines with submission status first, file submission later
+- chats for student-teacher, class groups, and support
+- announcements as a separate important-update feed
+- calendar, resources/downloads, search, notification preferences, language, theme, and account security
+- offline-friendly basics for dashboard, resources, and recent messages
+
+Heavy workflows such as course creation, analytics, deep content editing, exam authoring, feature management, and organization administration stay in the web app.
+
 ## Development
 
 ```sh

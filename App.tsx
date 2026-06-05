@@ -1,88 +1,95 @@
 import "./global.css";
 
+import { useMemo, useState } from "react";
+import { ScrollView, useWindowDimensions, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Platform, Pressable, ScrollView, Text, useWindowDimensions, View } from "react-native";
 
-import { SectionTitle } from "@/components/SectionTitle";
-import { StatCard } from "@/components/StatCard";
-import { TimelineItemCard } from "@/components/TimelineItemCard";
-import { dashboardStats, quickActions, timeline } from "@/data/dashboard";
+import { BottomTabs } from "@/components/layout/BottomTabs";
+import { AppHeader } from "@/components/layout/AppHeader";
+import { assignments, courses, notifications, profile, type UserRole } from "@/data/mobileMvp";
+import { AuthScreen } from "@/screens/AuthScreen";
+import { ChatScreen } from "@/screens/ChatScreen";
+import { CoursesScreen } from "@/screens/CoursesScreen";
+import { DashboardScreen } from "@/screens/DashboardScreen";
+import { MoreScreen } from "@/screens/MoreScreen";
+import { TasksScreen } from "@/screens/TasksScreen";
+import type { AuthMode, ScreenKey, TabItem } from "@/types/navigation";
+
+const tabs: TabItem[] = [
+  { key: "dashboard", label: "Today", icon: "T" },
+  { key: "courses", label: "Classes", icon: "C" },
+  { key: "tasks", label: "Tasks", icon: "D" },
+  { key: "chat", label: "Chat", icon: "M" },
+  { key: "more", label: "More", icon: "+" }
+];
 
 export default function App() {
   const { width } = useWindowDimensions();
-  const isCompactPhone = width < 360;
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [authMode, setAuthMode] = useState<AuthMode>("login");
+  const [activeTab, setActiveTab] = useState<ScreenKey>("dashboard");
+  const [role, setRole] = useState<UserRole>(profile.role);
+  const isCompact = width < 360;
   const isTablet = width >= 768;
-  const horizontalPadding = isCompactPhone ? 16 : isTablet ? 32 : 20;
-  const contentMaxWidth = isTablet ? 760 : undefined;
+  const contentPadding = isCompact ? 14 : isTablet ? 28 : 20;
+  const contentMaxWidth = isTablet ? 820 : undefined;
+
+  const stats = useMemo(
+    () => [
+      { label: "Classes", value: String(courses.length), tone: "cyan" as const },
+      {
+        label: "Pending",
+        value: String(assignments.filter((assignment) => ["pending", "overdue"].includes(assignment.status)).length),
+        tone: "amber" as const
+      },
+      { label: "Unread", value: String(notifications.filter((item) => item.unread).length), tone: "emerald" as const },
+      {
+        label: "Progress",
+        value: `${Math.round(courses.reduce((sum, course) => sum + course.progress, 0) / courses.length)}%`,
+        tone: "violet" as const
+      }
+    ],
+    []
+  );
+
+  if (!isAuthenticated) {
+    return (
+      <AuthScreen
+        authMode={authMode}
+        contentPadding={contentPadding}
+        isCompact={isCompact}
+        onAuthenticate={() => setIsAuthenticated(true)}
+        setAuthMode={setAuthMode}
+      />
+    );
+  }
 
   return (
     <SafeAreaView className="flex-1 bg-slate-50">
-      <ScrollView
-        className="flex-1"
-        contentContainerStyle={{
-          alignSelf: "center",
-          maxWidth: contentMaxWidth,
-          paddingBottom: 32,
-          paddingHorizontal: horizontalPadding,
-          width: "100%"
-        }}
-      >
-        <View className="pt-4">
-          <View className="flex-row flex-wrap items-center gap-2">
-            <Text className="text-sm font-semibold uppercase text-brand-600">Eduverse</Text>
-            <Text className="rounded-md bg-white px-2 py-1 text-xs font-semibold uppercase text-slate-500">
-              {Platform.OS === "ios" ? "iPhone ready" : Platform.OS === "android" ? "Android ready" : "Responsive"}
-            </Text>
-          </View>
-          <Text className={`${isCompactPhone ? "text-2xl leading-8" : "text-3xl leading-9"} mt-2 font-bold text-ink`}>
-            Today at a glance
-          </Text>
-          <Text className={`${isCompactPhone ? "text-sm leading-5" : "text-base leading-6"} mt-2 text-slate-600`}>
-            Your mobile command center for learning updates, messages, and deadlines.
-          </Text>
-        </View>
+      <View className="flex-1">
+        <ScrollView
+          className="flex-1"
+          contentContainerStyle={{
+            alignSelf: "center",
+            maxWidth: contentMaxWidth,
+            paddingBottom: 104,
+            paddingHorizontal: contentPadding,
+            paddingTop: 12,
+            width: "100%"
+          }}
+        >
+          <AppHeader role={role} setRole={setRole} />
+          {activeTab === "dashboard" ? <DashboardScreen stats={stats} isTablet={isTablet} /> : null}
+          {activeTab === "courses" ? <CoursesScreen isTablet={isTablet} /> : null}
+          {activeTab === "tasks" ? <TasksScreen isTablet={isTablet} /> : null}
+          {activeTab === "chat" ? <ChatScreen isTablet={isTablet} /> : null}
+          {activeTab === "more" ? (
+            <MoreScreen role={role} setRole={setRole} onSignOut={() => setIsAuthenticated(false)} isTablet={isTablet} />
+          ) : null}
+        </ScrollView>
 
-        <View className="mt-6 rounded-lg bg-ink p-5">
-          <View className={isTablet ? "flex-row items-center justify-between gap-5" : "gap-4"}>
-            <View className="flex-1">
-              <Text className="text-sm font-semibold uppercase text-cyan-200">Next class</Text>
-              <Text className="mt-2 text-xl font-bold text-white">Data Structures</Text>
-              <Text className="mt-1 text-sm text-slate-300">Starts at 14:30 in Room B12</Text>
-            </View>
-            <Pressable className="self-start rounded-md bg-brand-500 px-4 py-3">
-              <Text className="text-sm font-bold text-white">Open class</Text>
-            </Pressable>
-          </View>
-        </View>
-
-        <SectionTitle title="Snapshot" />
-        <View className={isTablet ? "flex-row gap-3" : ""}>
-          {dashboardStats.map((stat) => (
-            <StatCard key={stat.label} {...stat} isFluid={isTablet} />
-          ))}
-        </View>
-
-        <SectionTitle title="Quick actions" />
-        <View className={isTablet ? "flex-row flex-wrap gap-3" : "gap-3"}>
-          {quickActions.map((action) => (
-            <Pressable
-              key={action.title}
-              className="rounded-lg border border-slate-200 bg-white p-4"
-              style={{ width: isTablet ? "48.5%" : "100%" }}
-            >
-              <Text className="text-base font-semibold text-ink">{action.title}</Text>
-              <Text className="mt-1 text-sm leading-5 text-slate-600">{action.description}</Text>
-            </Pressable>
-          ))}
-        </View>
-
-        <SectionTitle title="Latest updates" action="View all" />
-        <View className={isTablet ? "flex-row flex-wrap gap-3" : ""}>
-          {timeline.map((item) => (
-            <TimelineItemCard key={`${item.title}-${item.time}`} {...item} isFluid={isTablet} />
-          ))}
-        </View>
-      </ScrollView>
+        <BottomTabs activeTab={activeTab} contentMaxWidth={contentMaxWidth} onChangeTab={setActiveTab} tabs={tabs} />
+      </View>
     </SafeAreaView>
   );
 }
