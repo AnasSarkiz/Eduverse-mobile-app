@@ -8,8 +8,8 @@ type SegmentProps = {
 
 export function Segment({ label, isActive, onPress }: SegmentProps) {
   return (
-    <Pressable className={`flex-1 rounded-md px-3 py-3 ${isActive ? "bg-primary" : "bg-transparent"}`} onPress={onPress}>
-      <Text className={`text-center text-sm font-bold ${isActive ? "text-white" : "text-muted-foreground dark:text-dark-muted-foreground"}`}>{label}</Text>
+    <Pressable className={`flex-1 rounded-full px-3 py-3 ${isActive ? "bg-sky-500" : "bg-transparent"}`} onPress={onPress}>
+      <Text className={`text-center text-sm font-bold ${isActive ? "text-white" : "text-slate-400"}`}>{label}</Text>
     </Pressable>
   );
 }
