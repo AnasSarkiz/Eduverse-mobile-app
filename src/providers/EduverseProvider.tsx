@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { Linking } from "react-native";
 import type { User } from "@supabase/supabase-js";
 
 import {
@@ -9,6 +10,7 @@ import {
   loadNotifications,
   loadOrganizationClasses,
   loadProfileAndOrganizations,
+  loadMaterialDownloadUrl,
   markNotificationRead,
   onAuthStateChange,
   resetPassword,
@@ -45,6 +47,7 @@ type EduverseContextValue = {
   user: AppUser | null;
   forgotPassword(email: string): Promise<void>;
   markRead(notificationId: string): Promise<void>;
+  openMaterial(materialId: string): Promise<void>;
   refresh(): Promise<void>;
   selectClass(classId: string): Promise<void>;
   selectOrganization(organizationId: string): Promise<void>;
@@ -185,6 +188,19 @@ export function EduverseProvider({ children }: { children: ReactNode }) {
     );
   }
 
+  async function openMaterial(materialId: string) {
+    const material = materials.find((item) => item.id === materialId);
+    if (!material) return;
+
+    try {
+      setErrorMessage(null);
+      const download = await loadMaterialDownloadUrl(material.classId, material.id);
+      await Linking.openURL(download.url);
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : "Could not open this material.");
+    }
+  }
+
   async function signIn(email: string, password: string) {
     await signInWithPassword(email, password);
     await refresh();
@@ -217,6 +233,7 @@ export function EduverseProvider({ children }: { children: ReactNode }) {
     materials,
     messages,
     notifications,
+    openMaterial,
     organizations,
     refresh,
     selectClass,

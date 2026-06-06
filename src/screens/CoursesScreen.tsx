@@ -6,7 +6,7 @@ import { Section } from "@/components/common/Section";
 import { useEduverse } from "@/providers/EduverseProvider";
 
 export function CoursesScreen({ isTablet }: { isTablet: boolean }) {
-  const { assignments, classes, materials, messages, selectClass } = useEduverse();
+  const { assignments, classes, materials, messages, openMaterial, selectClass } = useEduverse();
 
   return (
     <View>
@@ -38,8 +38,9 @@ export function CoursesScreen({ isTablet }: { isTablet: boolean }) {
         <SimpleRow
           key={resource.id}
           title={resource.title}
-          meta={`${classes.find((classItem) => classItem.id === resource.classId)?.code ?? "Class"} · ${resource.type.toUpperCase()}`}
-          trailing="Online"
+          meta={`${classes.find((classItem) => classItem.id === resource.classId)?.code ?? "Class"} · ${resource.type.toUpperCase()} · ${resource.originalFilename}`}
+          trailing="Open"
+          onPress={() => openMaterial(resource.id)}
         />
       ))}
       {materials.length === 0 ? <EmptyText text="No class materials have been uploaded yet." /> : null}

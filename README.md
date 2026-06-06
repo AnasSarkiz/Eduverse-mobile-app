@@ -129,17 +129,16 @@ bun run typecheck      # Run TypeScript checks
 
 ## Runtime Data Flow
 
-`EduverseProvider` is the main application data boundary. It handles:
+`EduverseProvider` is the main application data boundary. It keeps Supabase auth local and sends classroom data through the Eduverse web API with the active Supabase bearer token. It handles:
 
 - Supabase session detection and auth state changes.
-- Loading the user profile and active organization.
-- Loading organization classes, notifications, assignments, materials, and class messages.
+- Loading the user profile and active organization from `/api/me`.
+- Loading organization classes, notifications, assignments, materials, and class messages from the web API.
 - Switching organizations and active classes.
 - Sending class chat messages.
 - Submitting text responses for assignments.
 - Marking notifications as read.
-
-The service layer currently talks directly to Supabase tables for most reads and writes. For production hardening, server-owned workflows should move through the web app API routes in `../Eduverse`, especially where validation, storage, notifications, or role checks matter.
+There is still a direct Supabase client in the app, but it is used for authentication/session state rather than classroom table access.
 
 ## Relationship To The Web App
 
@@ -167,7 +166,7 @@ Keep these workflows mobile-first:
 ## Known MVP Limitations
 
 - Chat message previews are currently loaded for the active class, so non-active class previews can be incomplete.
-- Materials are listed but do not yet open signed download URLs.
+- Materials open through signed download URLs from the web API.
 - Some settings toggles are local UI state and are not yet persisted to user preferences.
 - Assignment submission supports text responses; file submission should be added through web API routes.
 - The dashboard shows an offline-cache-ready label, but true offline caching is not implemented yet.
@@ -176,9 +175,8 @@ These are documented intentionally so future work can improve the mobile app wit
 
 ## Recommended Next Steps
 
-- Route mobile mutations through the web API with the Supabase access token.
 - Add mobile-specific dashboard and conversation summary endpoints.
-- Add signed material download/open flows.
+- Add chat media upload through the web API media route.
 - Persist notification, language, theme, and offline preferences.
 - Store messages by class id instead of using one global active-class message list.
 - Add optimistic and error states for chat, assignment submission, notification reads, and organization switching.
