@@ -1,46 +1,60 @@
 # Eduverse Mobile App
 
-Supporting mobile app for Eduverse, focused on the daily student and teacher workflow rather than duplicating every web feature.
+Eduverse Mobile is the Expo companion app for the Eduverse learning platform. It is focused on daily student and teacher workflows: checking today, opening classes, tracking assignments, reading notifications, joining class conversations, and submitting lightweight assignment responses from a phone.
 
-## Stack
+The mobile app is intentionally not a full administration console. Heavy workflows such as organization management, class creation, analytics, exam authoring, content editing, and feature configuration belong in the web app at `../Eduverse`.
 
-- React Native with Expo
+## Product Scope
+
+- Email/password authentication through Supabase.
+- Profile and active organization context.
+- Today dashboard with class, task, unread, and progress metrics.
+- Course/class overview with schedule, teacher, room, materials count, progress, and chat entry.
+- Assignments and deadlines with submission status and text response submission.
+- Class chat with active-class message loading and send support.
+- Announcement feed through notification records.
+- Settings surface for account actions, theme, notification preferences, organization chips, and future preferences.
+- Responsive layouts for compact phones, standard phones, large phones, foldables, and tablets.
+
+## Tech Stack
+
+- Expo SDK 54
+- React Native 0.81
+- React 19
 - TypeScript
-- NativeWind / Tailwind CSS
-- Bun for dependency installation
+- NativeWind and Tailwind CSS
+- Supabase JavaScript client
+- AsyncStorage-backed Supabase auth sessions
+- Lucide React Native icons
+- Bun for dependency management and tests
 
-The project targets Expo SDK 54 so it works with the Expo Go 54 app currently available on iOS.
+## Repository Structure
 
-## First MVP Scope
+```txt
+App.tsx                     Root app shell, auth gate, tab state, and responsive layout
+src/components/common/      Reusable buttons, inputs, sections, badges, settings rows, and controls
+src/components/cards/       Dashboard, course, assignment, notification, progress, and row cards
+src/components/layout/      App header and bottom tab navigation
+src/config/                 Runtime environment helpers and tests
+src/lib/                    Supabase client setup
+src/providers/              EduverseProvider for auth, profile, classes, assignments, materials, messages, and notifications
+src/screens/                Auth, dashboard, courses, tasks, chat, and more/settings screens
+src/services/               Supabase-backed Eduverse data service
+src/types/                  Navigation and shared UI types
+```
 
-1. Auth and profile
-2. Dashboard
-3. Notifications
-4. Courses and classes overview
-5. Assignments and deadlines
-6. Chat
-7. Announcements
-8. Settings
+## Prerequisites
 
-## Mobile Product Direction
+- Node.js 22 LTS
+- Bun
+- Expo Go 54 on the target device, or a compatible Expo development build
+- Access to the same Supabase project used by the Eduverse web app
 
-The mobile app should be the daily companion for Eduverse, not the admin console. It focuses on fast student/teacher workflows:
+Expo and Metro can be unstable on very new non-LTS Node versions. Use Node 22 LTS for the smoothest development setup.
 
-- auth, signup, forgot password, profile, organization role context
-- notifications for course updates, chats, deadlines, and announcements
-- dashboard with upcoming tasks, enrolled classes, recent activity, and progress
-- course/class overview with live session entry, materials, chat, assignments, and results shortcuts
-- assignments and deadlines with submission status first, file submission later
-- chats for student-teacher, class groups, and support
-- announcements as a separate important-update feed
-- calendar, resources/downloads, search, notification preferences, language, theme, and account security
-- offline-friendly basics for dashboard, resources, and recent messages
+## Environment Setup
 
-Heavy workflows such as course creation, analytics, deep content editing, exam authoring, feature management, and organization administration stay in the web app.
-
-## Development
-
-Create `.env` from `.env.example` and copy the public Supabase values from the web app:
+Create a local environment file:
 
 ```sh
 cp .env.example .env
@@ -48,41 +62,130 @@ cp .env.example .env
 
 Required values:
 
-- `NEXT_PUBLIC_SUPABASE_URL`
-- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
-- `EXPO_PUBLIC_EDUVERSE_API_BASE_URL=https://eduverse-demo.vercel.app`
+```txt
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
+EXPO_PUBLIC_EDUVERSE_API_BASE_URL=https://eduverse-demo.vercel.app
+```
 
-The mobile app also supports `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, but you do not need to duplicate values if your `.env` already uses the `NEXT_PUBLIC_SUPABASE_*` names from the web app. `app.config.js` bridges those values into Expo runtime config for iOS and Android.
+The app also supports Expo-native names:
 
-Do not copy server-only web secrets into the mobile app, including `SUPABASE_SECRET_KEY`, AWS keys, or LiveKit API secrets.
+```txt
+EXPO_PUBLIC_SUPABASE_URL=
+EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
+```
+
+You do not need to duplicate values if `.env` already uses the `NEXT_PUBLIC_SUPABASE_*` names copied from the web app. `app.config.js` bridges those values into Expo runtime config for iOS and Android.
+
+Do not copy server-only web secrets into this repository. Keep these out of the mobile app:
+
+- `SUPABASE_SECRET_KEY`
+- AWS access keys
+- LiveKit API secrets
+- Any private service role or server credential
+
+## Getting Started
+
+Install dependencies:
 
 ```sh
 bun install
+```
+
+Start Expo:
+
+```sh
 bun run start
 ```
 
-Use the Expo CLI prompt to launch iOS, Android, or web.
+Use the Expo CLI prompt to open iOS, Android, or web.
 
-Use Node 22 LTS for this project. Expo/Metro can crash or be killed on very new non-LTS Node versions.
+For a fresh Metro cache:
 
-## Test on Real Devices
+```sh
+bun run start:clear
+```
 
-Install Expo Go on the phone first:
-
-- iPhone: install `Expo Go` from the App Store.
-- Android: install `Expo Go` from Google Play.
-
-Then start the project with a QR code:
+For real-device testing across networks:
 
 ```sh
 bun run start:tunnel
 ```
 
-Scan the QR code with the iPhone Camera app or the Expo Go scanner on Android. Use `bun run start:clear` if Metro gets stuck with old cache.
+Scan the QR code with the iPhone Camera app or the Expo Go scanner on Android.
+
+## Available Scripts
+
+```sh
+bun run start          # Start Expo
+bun run start:clear    # Start Expo with a cleared Metro cache
+bun run start:tunnel   # Start Expo through a tunnel for real-device testing
+bun run android        # Start Expo and open Android
+bun run ios            # Start Expo and open iOS
+bun run web            # Start Expo web
+bun run test           # Run Bun tests
+bun run typecheck      # Run TypeScript checks
+```
+
+## Runtime Data Flow
+
+`EduverseProvider` is the main application data boundary. It handles:
+
+- Supabase session detection and auth state changes.
+- Loading the user profile and active organization.
+- Loading organization classes, notifications, assignments, materials, and class messages.
+- Switching organizations and active classes.
+- Sending class chat messages.
+- Submitting text responses for assignments.
+- Marking notifications as read.
+
+The service layer currently talks directly to Supabase tables for most reads and writes. For production hardening, server-owned workflows should move through the web app API routes in `../Eduverse`, especially where validation, storage, notifications, or role checks matter.
+
+## Relationship To The Web App
+
+The web app is the system of record for administration and heavier classroom workflows. The mobile app should remain a fast daily companion.
+
+Keep these workflows in the web app:
+
+- Organization creation and administration
+- Class creation and archive management
+- Deep analytics and history
+- Exam authoring and management
+- Feature and extension management
+- Rich content editing
+- Advanced file and material administration
+
+Keep these workflows mobile-first:
+
+- Today overview
+- Notifications
+- Class schedule and resource discovery
+- Assignment status and simple submission
+- Class chat and announcements
+- Account settings and preferences
+
+## Known MVP Limitations
+
+- Chat message previews are currently loaded for the active class, so non-active class previews can be incomplete.
+- Materials are listed but do not yet open signed download URLs.
+- Some settings toggles are local UI state and are not yet persisted to user preferences.
+- Assignment submission supports text responses; file submission should be added through web API routes.
+- The dashboard shows an offline-cache-ready label, but true offline caching is not implemented yet.
+
+These are documented intentionally so future work can improve the mobile app without confusing MVP UI with complete production behavior.
+
+## Recommended Next Steps
+
+- Route mobile mutations through the web API with the Supabase access token.
+- Add mobile-specific dashboard and conversation summary endpoints.
+- Add signed material download/open flows.
+- Persist notification, language, theme, and offline preferences.
+- Store messages by class id instead of using one global active-class message list.
+- Add optimistic and error states for chat, assignment submission, notification reads, and organization switching.
 
 ## Troubleshooting
 
-If `bun run start` exits with `SIGKILL` or `zsh: killed`, check Node:
+If Expo exits with `SIGKILL` or `zsh: killed`, check Node:
 
 ```sh
 node --version
@@ -98,13 +201,8 @@ bun install
 bun run start:clear
 ```
 
-## Responsive Targets
+If environment values do not appear to update, restart Expo after changing `.env`. Expo public runtime values are read during startup.
 
-The starter screen is tuned for:
+## Project Status
 
-- compact phones around 320-359 px wide
-- common iPhone and Android phones around 360-430 px wide
-- large phones and foldables
-- tablet widths from 768 px and up
-
-The app uses `useWindowDimensions` for runtime layout decisions and NativeWind for the visual system.
+Eduverse Mobile is a strong MVP foundation with real Supabase auth, domain data loading, NativeWind styling, responsive phone/tablet behavior, and a clean provider/service/screen/component structure. The next major step is moving server-sensitive workflows behind the Eduverse web API so mobile stays lightweight while the platform keeps validation and side effects centralized.
