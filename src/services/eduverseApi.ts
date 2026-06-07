@@ -245,6 +245,33 @@ export async function markNotificationRead(notificationId: string) {
   await jsonRequest(`/api/notifications/${notificationId}`, {}, { method: "PATCH" });
 }
 
+export function subscribeToNotificationInserts(input: {
+  organizationId: string;
+  userId: string;
+  onInsert: (notification: NotificationRecord) => void;
+}) {
+  const channel = db()
+    .channel(`eduverse-notifications:${input.organizationId}:${input.userId}`)
+    .on(
+      "postgres_changes",
+      {
+        event: "INSERT",
+        filter: `recipient_user_id=eq.${input.userId}`,
+        schema: "public",
+        table: "notifications"
+      },
+      (payload) => {
+        const notification = toNotificationRecord(payload.new);
+        if (notification.organizationId === input.organizationId) input.onInsert(notification);
+      }
+    )
+    .subscribe();
+
+  return () => {
+    void db().removeChannel(channel);
+  };
+}
+
 export async function loadAssignmentsForClasses(classIds: string[], _userId: string, _canManage: boolean) {
   if (classIds.length === 0) return [];
 
@@ -322,4 +349,17 @@ function toAppRole(role?: OrganizationUserRole | null): AppRole {
   if (role === "teacher") return "teacher";
   if (role === "org_owner" || role === "org_admin") return "admin";
   return "student";
+}
+
+function toNotificationRecord(row: any): NotificationRecord {
+  return {
+    body: row.body,
+    classId: row.class_id,
+    createdAt: row.created_at,
+    id: row.id,
+    organizationId: row.organization_id,
+    readAt: row.read_at,
+    title: row.title,
+    type: row.type
+  };
 }

@@ -13,9 +13,16 @@ type MoreScreenProps = {
 };
 
 export function MoreScreen({ onSignOut, isTablet }: MoreScreenProps) {
-  const { activeOrganization, organizations, selectOrganization, user } = useEduverse();
+  const {
+    activeOrganization,
+    notificationStatus,
+    organizations,
+    pushNotificationsEnabled,
+    selectOrganization,
+    setPushNotificationsEnabled,
+    user
+  } = useEduverse();
   const { colorScheme, setColorScheme } = useColorScheme();
-  const [pushEnabled, setPushEnabled] = useState(true);
   const [offlineEnabled, setOfflineEnabled] = useState(true);
   const isDarkTheme = colorScheme === "dark";
 
@@ -32,7 +39,7 @@ export function MoreScreen({ onSignOut, isTablet }: MoreScreenProps) {
 
       <Section title="Settings" action="Preferences" />
       <View className={isTablet ? "flex-row flex-wrap gap-3" : "gap-3"}>
-        <SettingRow label="Push notifications" value={pushEnabled} onChange={setPushEnabled} isTablet={isTablet} />
+        <SettingRow label="Push notifications" value={pushNotificationsEnabled} onChange={(enabled) => void setPushNotificationsEnabled(enabled)} isTablet={isTablet} />
         <SettingRow label="Offline basics" value={offlineEnabled} onChange={setOfflineEnabled} isTablet={isTablet} />
         <SettingRow
           label="Dark theme"
@@ -41,6 +48,7 @@ export function MoreScreen({ onSignOut, isTablet }: MoreScreenProps) {
           isTablet={isTablet}
         />
       </View>
+      <Text className="mt-3 text-xs leading-5 text-muted-foreground dark:text-dark-muted-foreground">{getNotificationStatusText(notificationStatus)}</Text>
 
       <Section title="Organizations" />
       <View className="flex-row gap-2">
@@ -78,4 +86,11 @@ export function MoreScreen({ onSignOut, isTablet }: MoreScreenProps) {
       </Pressable>
     </View>
   );
+}
+
+function getNotificationStatusText(status: "idle" | "granted" | "denied" | "unavailable") {
+  if (status === "granted") return "Device notifications are enabled for realtime Eduverse updates.";
+  if (status === "denied") return "Device notifications are blocked in system settings.";
+  if (status === "unavailable") return "Device notifications are unavailable on this device.";
+  return "Device notification permissions have not been checked yet.";
 }

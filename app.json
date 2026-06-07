@@ -16,8 +16,10 @@
     },
     "android": {
       "edgeToEdgeEnabled": true,
-      "package": "com.eduverse.mobile"
+      "package": "com.eduverse.mobile",
+      "softwareKeyboardLayoutMode": "resize"
     },
+    "plugins": ["expo-notifications"],
     "web": {
       "bundler": "metro"
     }

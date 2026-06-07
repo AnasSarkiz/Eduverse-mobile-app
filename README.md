@@ -134,10 +134,12 @@ bun run typecheck      # Run TypeScript checks
 - Supabase session detection and auth state changes.
 - Loading the user profile and active organization from `/api/me`.
 - Loading organization classes, notifications, assignments, materials, and class messages from the web API.
+- Subscribing to realtime notification inserts for the active organization.
 - Switching organizations and active classes.
 - Sending class chat messages.
 - Submitting text responses for assignments.
 - Marking notifications as read.
+- Requesting device notification permission and showing local device alerts for realtime Eduverse notification inserts while the app is running.
 There is still a direct Supabase client in the app, but it is used for authentication/session state rather than classroom table access.
 
 ## Relationship To The Web App
@@ -168,6 +170,7 @@ Keep these workflows mobile-first:
 - Chat message previews are currently loaded for the active class, so non-active class previews can be incomplete.
 - Materials open through signed download URLs from the web API.
 - Some settings toggles are local UI state and are not yet persisted to user preferences.
+- Push notification settings are persisted locally, but true remote push delivery still needs a web API route/table for Expo push token registration and a server sender.
 - Assignment submission supports text responses; file submission should be added through web API routes.
 - The dashboard shows an offline-cache-ready label, but true offline caching is not implemented yet.
 
@@ -176,6 +179,7 @@ These are documented intentionally so future work can improve the mobile app wit
 ## Recommended Next Steps
 
 - Add mobile-specific dashboard and conversation summary endpoints.
+- Add server-side Expo push token registration and delivery for background/killed-app notifications.
 - Add chat media upload through the web API media route.
 - Persist notification, language, theme, and offline preferences.
 - Store messages by class id instead of using one global active-class message list.
