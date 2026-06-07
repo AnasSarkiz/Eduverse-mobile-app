@@ -12,6 +12,7 @@ import { AuthScreen } from "@/screens/AuthScreen";
 import { ChatScreen } from "@/screens/ChatScreen";
 import { CoursesScreen } from "@/screens/CoursesScreen";
 import { DashboardScreen } from "@/screens/DashboardScreen";
+import { LiveSessionScreen } from "@/screens/LiveSessionScreen";
 import { MoreScreen } from "@/screens/MoreScreen";
 import { TasksScreen } from "@/screens/TasksScreen";
 import type { AuthMode, ScreenKey, TabItem } from "@/types/navigation";
@@ -35,6 +36,7 @@ export default function App() {
 function AppContent() {
   const {
     assignments,
+    activeLiveSession,
     classes,
     errorMessage,
     forgotPassword,
@@ -101,6 +103,10 @@ function AppContent() {
         <Text className="mt-3 text-sm font-semibold text-muted-foreground dark:text-dark-muted-foreground">Loading Eduverse...</Text>
       </SafeAreaView>
     );
+  }
+
+  if (activeLiveSession) {
+    return <LiveSessionScreen />;
   }
 
   return (

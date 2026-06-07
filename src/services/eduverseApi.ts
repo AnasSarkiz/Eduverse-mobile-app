@@ -120,6 +120,31 @@ export type NotificationRecord = {
   createdAt: string;
 };
 
+export type ClassLiveSession = {
+  id: string;
+  organization_id: string;
+  class_id: string;
+  room_name: string;
+  live_session_id: string;
+  started_by_user_id: string;
+  status: "pending" | "live" | "ended";
+  started_at: string;
+  last_seen_at: string;
+  ended_at: string | null;
+};
+
+export type LiveSessionToken = {
+  liveSessionId: string;
+  participantToken: string;
+  roomName: string;
+  serverUrl: string;
+};
+
+export type LiveSessionUpdateResult = {
+  liveSessionId?: string;
+  ok: boolean;
+};
+
 function db() {
   return getSupabaseClient();
 }
@@ -239,6 +264,76 @@ export async function loadNotifications(organizationId: string, _userId: string)
     `/api/notifications?organizationId=${encodeURIComponent(organizationId)}`
   );
   return payload.notifications ?? [];
+}
+
+export async function loadOrganizationLiveSessions(organizationId: string) {
+  const payload = await apiRequest<{ liveSessions: ClassLiveSession[] }>(`/api/organizations/${organizationId}/live-sessions`);
+  return payload.liveSessions ?? [];
+}
+
+export async function createLiveSessionToken(input: {
+  classId: string;
+  liveSessionId?: string | null;
+  user: AppUser;
+}) {
+  return jsonRequest<LiveSessionToken>(
+    "/api/livekit/token",
+    {
+      classId: input.classId,
+      liveSessionId: input.liveSessionId,
+      user: {
+        id: input.user.id,
+        name: input.user.name,
+        role: input.user.role
+      }
+    },
+    { method: "POST" }
+  );
+}
+
+export async function startClassLiveSession(input: {
+  classId: string;
+  liveSessionId: string;
+  roomName: string;
+}) {
+  return jsonRequest<LiveSessionUpdateResult>(
+    `/api/classes/${input.classId}/live-session`,
+    {
+      liveSessionId: input.liveSessionId,
+      roomName: input.roomName
+    },
+    { method: "POST" }
+  );
+}
+
+export async function heartbeatClassLiveSession(input: {
+  classId: string;
+  liveSessionId: string;
+  roomName: string;
+}) {
+  return jsonRequest<LiveSessionUpdateResult>(
+    `/api/classes/${input.classId}/live-session`,
+    {
+      liveSessionId: input.liveSessionId,
+      roomName: input.roomName
+    },
+    { method: "PATCH" }
+  );
+}
+
+export async function endClassLiveSession(input: {
+  classId: string;
+  liveSessionId: string;
+  roomName: string;
+}) {
+  return jsonRequest<LiveSessionUpdateResult>(
+    `/api/classes/${input.classId}/live-session`,
+    {
+      liveSessionId: input.liveSessionId,
+      roomName: input.roomName
+    },
+    { method: "DELETE" }
+  );
 }
 
 export async function markNotificationRead(notificationId: string) {

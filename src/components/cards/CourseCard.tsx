@@ -6,6 +6,7 @@ import { Badge } from "@/components/common/Badge";
 import { ProgressBar } from "@/components/cards/ProgressBar";
 
 export type CourseCardModel = {
+  canStartSession?: boolean;
   id: string;
   code: string;
   instructor: string;
@@ -22,9 +23,12 @@ type CourseCardProps = {
   course: CourseCardModel;
   isTablet: boolean;
   onOpenChat?: () => void;
+  onOpenSession?: () => void;
 };
 
-export function CourseCard({ course, isTablet, onOpenChat }: CourseCardProps) {
+export function CourseCard({ course, isTablet, onOpenChat, onOpenSession }: CourseCardProps) {
+  const sessionAvailable = course.liveNow || course.canStartSession;
+
   return (
     <View className="rounded-xl border border-border dark:border-dark-border bg-card dark:bg-dark-card p-4 shadow-sm" style={{ width: isTablet ? "48.5%" : "100%" }}>
       <View className="flex-row items-start justify-between gap-3">
@@ -45,7 +49,7 @@ export function CourseCard({ course, isTablet, onOpenChat }: CourseCardProps) {
       </Text>
       <ProgressBar value={course.progress} />
       <View className="mt-4 flex-row gap-2">
-        <ActionButton icon={Radio} label="Home" />
+        <ActionButton icon={Radio} label={course.liveNow ? "Join live" : course.canStartSession ? "Start live" : "Session"} isPrimary={course.liveNow} onPress={sessionAvailable ? onOpenSession : undefined} />
         <ActionButton icon={MessageSquare} label="Chat" onPress={onOpenChat} />
         <ActionButton icon={FileText} label="Materials" />
       </View>

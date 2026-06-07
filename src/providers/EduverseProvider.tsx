@@ -11,12 +11,16 @@ import {
   type DeviceNotificationStatus
 } from "@/services/deviceNotifications";
 import {
+  createLiveSessionToken,
+  endClassLiveSession,
   getSessionUser,
+  heartbeatClassLiveSession,
   loadAssignmentsForClasses,
   loadMaterialsForClasses,
   loadMessagesForClass,
   loadNotifications,
   loadOrganizationClasses,
+  loadOrganizationLiveSessions,
   loadProfileAndOrganizations,
   loadMaterialDownloadUrl,
   markNotificationRead,
@@ -27,13 +31,16 @@ import {
   signInWithPassword,
   signOut,
   signUpWithPassword,
+  startClassLiveSession,
   subscribeToNotificationInserts,
   submitAssignmentText,
   type AppOrganization,
   type AppUser,
   type ChatMessage,
   type ClassAssignment,
+  type ClassLiveSession,
   type ClassMaterial,
+  type LiveSessionToken,
   type NotificationRecord,
   type OrganizationClass
 } from "@/services/eduverseApi";
@@ -42,14 +49,25 @@ type DataStatus = "idle" | "loading" | "ready" | "error";
 
 const PUSH_NOTIFICATIONS_KEY = "eduverse:push-notifications-enabled";
 
+export type ActiveLiveSession = {
+  classId: string;
+  className: string;
+  isHost: boolean;
+  joinedAt: string;
+  markedLiveAt: string | null;
+  token: LiveSessionToken;
+};
+
 type EduverseContextValue = {
   activeClass: OrganizationClass | null;
+  activeLiveSession: ActiveLiveSession | null;
   activeOrganization: AppOrganization | null;
   assignments: ClassAssignment[];
   classes: OrganizationClass[];
   errorMessage: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  liveSessions: ClassLiveSession[];
   materials: ClassMaterial[];
   messages: ChatMessage[];
   notificationStatus: DeviceNotificationStatus;
@@ -59,6 +77,9 @@ type EduverseContextValue = {
   status: DataStatus;
   user: AppUser | null;
   forgotPassword(email: string): Promise<void>;
+  joinLiveSession(classId: string): Promise<void>;
+  leaveLiveSession(options?: { endSession?: boolean }): Promise<void>;
+  markLiveSessionConnected(): Promise<void>;
   markRead(notificationId: string): Promise<void>;
   openMaterial(materialId: string): Promise<void>;
   refresh(): Promise<void>;
@@ -77,10 +98,12 @@ const EduverseContext = createContext<EduverseContextValue | null>(null);
 export function EduverseProvider({ children }: { children: ReactNode }) {
   const [authUser, setAuthUser] = useState<User | null>(null);
   const [activeClassId, setActiveClassId] = useState<string | null>(null);
+  const [activeLiveSession, setActiveLiveSession] = useState<ActiveLiveSession | null>(null);
   const [activeOrganization, setActiveOrganization] = useState<AppOrganization | null>(null);
   const [assignments, setAssignments] = useState<ClassAssignment[]>([]);
   const [classes, setClasses] = useState<OrganizationClass[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [liveSessions, setLiveSessions] = useState<ClassLiveSession[]>([]);
   const [materials, setMaterials] = useState<ClassMaterial[]>([]);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [notificationStatus, setNotificationStatus] = useState<DeviceNotificationStatus>("idle");
@@ -103,9 +126,11 @@ export function EduverseProvider({ children }: { children: ReactNode }) {
       setAuthUser(sessionUser);
 
       if (!sessionUser) {
+        setActiveLiveSession(null);
         setActiveOrganization(null);
         setAssignments([]);
         setClasses([]);
+        setLiveSessions([]);
         setMaterials([]);
         setMessages([]);
         setNotifications([]);
@@ -121,8 +146,10 @@ export function EduverseProvider({ children }: { children: ReactNode }) {
       setUser(profileState.user);
 
       if (!profileState.activeOrganization) {
+        setActiveLiveSession(null);
         setAssignments([]);
         setClasses([]);
+        setLiveSessions([]);
         setMaterials([]);
         setMessages([]);
         setNotifications([]);
@@ -135,13 +162,15 @@ export function EduverseProvider({ children }: { children: ReactNode }) {
       setClasses(nextClasses);
       setActiveClassId((current) => (current && nextClasses.some((classItem) => classItem.id === current) ? current : nextClasses[0]?.id ?? null));
 
-      const [nextNotifications, nextAssignments, nextMaterials] = await Promise.all([
+      const [nextNotifications, nextAssignments, nextMaterials, nextLiveSessions] = await Promise.all([
         loadNotifications(profileState.activeOrganization.id, sessionUser.id),
         loadAssignmentsForClasses(nextClassIds, sessionUser.id, profileState.user.role === "admin" || profileState.user.role === "teacher"),
-        loadMaterialsForClasses(nextClassIds)
+        loadMaterialsForClasses(nextClassIds),
+        loadOrganizationLiveSessions(profileState.activeOrganization.id)
       ]);
 
       setAssignments(nextAssignments);
+      setLiveSessions(nextLiveSessions);
       setMaterials(nextMaterials);
       setNotifications(nextNotifications);
 
@@ -209,9 +238,30 @@ export function EduverseProvider({ children }: { children: ReactNode }) {
         if (pushNotificationsEnabled && notificationStatus === "granted") {
           void showEduverseNotification(notification).catch(() => null);
         }
+
+        if (notification.type === "session_started") {
+          void refresh();
+        }
       }
     });
   }, [activeOrganization, authUser, notificationStatus, pushNotificationsEnabled]);
+
+  useEffect(() => {
+    if (!activeLiveSession?.isHost || !activeLiveSession.markedLiveAt) return undefined;
+
+    const heartbeat = () => {
+      void heartbeatClassLiveSession({
+        classId: activeLiveSession.classId,
+        liveSessionId: activeLiveSession.token.liveSessionId,
+        roomName: activeLiveSession.token.roomName
+      }).catch((error) => {
+        setErrorMessage(error instanceof Error ? error.message : "Could not keep the live session active.");
+      });
+    };
+
+    const intervalId = setInterval(heartbeat, 60_000);
+    return () => clearInterval(intervalId);
+  }, [activeLiveSession]);
 
   async function selectOrganization(organizationId: string) {
     if (!authUser) return;
@@ -251,6 +301,81 @@ export function EduverseProvider({ children }: { children: ReactNode }) {
         notification.id === notificationId ? { ...notification, readAt: notification.readAt ?? new Date().toISOString() } : notification
       )
     );
+  }
+
+  async function joinLiveSession(classId: string) {
+    if (!user) return;
+
+    const liveSession = liveSessions.find((session) => session.class_id === classId);
+    const canStartSession = user.role === "admin" || user.role === "teacher";
+
+    if (!liveSession && !canStartSession) {
+      setErrorMessage("No live session is active for this class yet.");
+      return;
+    }
+
+    try {
+      setErrorMessage(null);
+      const token = await createLiveSessionToken({
+        classId,
+        liveSessionId: liveSession?.live_session_id ?? null,
+        user
+      });
+      const classItem = classes.find((item) => item.id === classId);
+
+      setActiveLiveSession({
+        classId,
+        className: classItem?.name ?? "Live session",
+        isHost: !liveSession && canStartSession,
+        joinedAt: new Date().toISOString(),
+        markedLiveAt: liveSession ? liveSession.started_at : null,
+        token
+      });
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : "Could not join the live session.");
+    }
+  }
+
+  async function markLiveSessionConnected() {
+    if (!activeLiveSession?.isHost || activeLiveSession.markedLiveAt) return;
+
+    try {
+      setErrorMessage(null);
+      await startClassLiveSession({
+        classId: activeLiveSession.classId,
+        liveSessionId: activeLiveSession.token.liveSessionId,
+        roomName: activeLiveSession.token.roomName
+      });
+      const markedLiveAt = new Date().toISOString();
+      setActiveLiveSession((current) => (current ? { ...current, markedLiveAt } : current));
+      if (activeOrganization) {
+        setLiveSessions(await loadOrganizationLiveSessions(activeOrganization.id));
+      }
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : "Could not start the live session.");
+    }
+  }
+
+  async function leaveLiveSession(options: { endSession?: boolean } = {}) {
+    const session = activeLiveSession;
+    setActiveLiveSession(null);
+    if (!session) return;
+
+    const shouldEndSession = options.endSession ?? session.isHost;
+    if (!shouldEndSession || !session.markedLiveAt) return;
+
+    try {
+      await endClassLiveSession({
+        classId: session.classId,
+        liveSessionId: session.token.liveSessionId,
+        roomName: session.token.roomName
+      });
+      if (activeOrganization) {
+        setLiveSessions(await loadOrganizationLiveSessions(activeOrganization.id));
+      }
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : "Could not end the live session.");
+    }
   }
 
   async function setPushNotificationsEnabled(enabled: boolean) {
@@ -307,12 +432,14 @@ export function EduverseProvider({ children }: { children: ReactNode }) {
   }
 
   async function signOutUser() {
+    setActiveLiveSession(null);
     await signOut();
     await refresh();
   }
 
   const value: EduverseContextValue = {
     activeClass,
+    activeLiveSession,
     activeOrganization,
     assignments,
     classes,
@@ -320,6 +447,10 @@ export function EduverseProvider({ children }: { children: ReactNode }) {
     forgotPassword,
     isAuthenticated: Boolean(authUser),
     isLoading: status === "loading",
+    joinLiveSession,
+    leaveLiveSession,
+    liveSessions,
+    markLiveSessionConnected,
     markRead,
     materials,
     messages,

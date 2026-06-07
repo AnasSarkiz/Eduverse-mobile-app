@@ -14,8 +14,10 @@ type DashboardScreenProps = {
 };
 
 export function DashboardScreen({ stats, isTablet }: DashboardScreenProps) {
-  const { activeClass, assignments, markRead, notifications, selectClass } = useEduverse();
+  const { activeClass, assignments, joinLiveSession, liveSessions, markRead, notifications, selectClass, user } = useEduverse();
   const nextTask = assignments.find((assignment) => !assignment.mySubmission) ?? assignments[0] ?? null;
+  const activeClassIsLive = activeClass ? liveSessions.some((session) => session.class_id === activeClass.id) : false;
+  const canStartSession = user?.role === "admin" || user?.role === "teacher";
 
   return (
     <View>
@@ -27,7 +29,19 @@ export function DashboardScreen({ stats, isTablet }: DashboardScreenProps) {
           {activeClass ? `${activeClass.schedule_text ?? "No schedule"} · ${activeClass.room ?? "No room"}` : "Join or create classes from the web app."}
         </Text>
         <View className="mt-4 flex-row flex-wrap gap-2">
-          <ActionButton icon={Radio} label="Open class" isPrimary onPress={() => activeClass && selectClass(activeClass.id)} />
+          <ActionButton
+            icon={Radio}
+            label={activeClassIsLive ? "Join live" : canStartSession ? "Start live" : "Open class"}
+            isPrimary={activeClassIsLive || canStartSession}
+            onPress={() => {
+              if (!activeClass) return;
+              if (activeClassIsLive || canStartSession) {
+                void joinLiveSession(activeClass.id);
+                return;
+              }
+              void selectClass(activeClass.id);
+            }}
+          />
           <ActionButton icon={FileText} label="View materials" />
         </View>
       </View>

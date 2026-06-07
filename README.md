@@ -12,6 +12,7 @@ The mobile app is intentionally not a full administration console. Heavy workflo
 - Course/class overview with schedule, teacher, room, materials count, progress, and chat entry.
 - Assignments and deadlines with submission status and text response submission.
 - Class chat with active-class message loading and send support.
+- Native LiveKit session discovery, join, start, mic/camera controls, participant tiles, heartbeat, and end support.
 - Announcement feed through notification records.
 - Settings surface for account actions, theme, notification preferences, organization chips, and future preferences.
 - Responsive layouts for compact phones, standard phones, large phones, foldables, and tablets.
@@ -47,7 +48,7 @@ src/types/                  Navigation and shared UI types
 
 - Node.js 22 LTS
 - Bun
-- Expo Go 54 on the target device, or a compatible Expo development build
+- Expo Go 54 on the target device for non-LiveKit flows, or a compatible Expo development build for live sessions
 - Access to the same Supabase project used by the Eduverse web app
 
 Expo and Metro can be unstable on very new non-LTS Node versions. Use Node 22 LTS for the smoothest development setup.
@@ -114,6 +115,13 @@ bun run start:tunnel
 
 Scan the QR code with the iPhone Camera app or the Expo Go scanner on Android.
 
+LiveKit uses native WebRTC modules, so live sessions do not run inside Expo Go. Use a development build when testing live classes:
+
+```sh
+bunx expo run:ios
+bunx expo run:android
+```
+
 ## Available Scripts
 
 ```sh
@@ -134,12 +142,15 @@ bun run typecheck      # Run TypeScript checks
 - Supabase session detection and auth state changes.
 - Loading the user profile and active organization from `/api/me`.
 - Loading organization classes, notifications, assignments, materials, and class messages from the web API.
+- Loading active class live sessions from the web API.
 - Subscribing to realtime notification inserts for the active organization.
 - Switching organizations and active classes.
 - Sending class chat messages.
 - Submitting text responses for assignments.
 - Marking notifications as read.
 - Requesting device notification permission and showing local device alerts for realtime Eduverse notification inserts while the app is running.
+- Joining native LiveKit rooms after validating access through the LiveKit token API.
+- Marking teacher-started sessions live, sending heartbeats, and ending sessions through the web API.
 There is still a direct Supabase client in the app, but it is used for authentication/session state rather than classroom table access.
 
 ## Relationship To The Web App
@@ -171,6 +182,8 @@ Keep these workflows mobile-first:
 - Materials open through signed download URLs from the web API.
 - Some settings toggles are local UI state and are not yet persisted to user preferences.
 - Push notification settings are persisted locally, but true remote push delivery still needs a web API route/table for Expo push token registration and a server sender.
+- Live sessions require an Expo development build because LiveKit WebRTC native modules are not available in Expo Go.
+- Live sessions support audio/video room join, start, heartbeat, and end. Whiteboard and in-session chat are still web-only.
 - Assignment submission supports text responses; file submission should be added through web API routes.
 - The dashboard shows an offline-cache-ready label, but true offline caching is not implemented yet.
 
@@ -180,6 +193,7 @@ These are documented intentionally so future work can improve the mobile app wit
 
 - Add mobile-specific dashboard and conversation summary endpoints.
 - Add server-side Expo push token registration and delivery for background/killed-app notifications.
+- Add native LiveKit whiteboard and in-session chat.
 - Add chat media upload through the web API media route.
 - Persist notification, language, theme, and offline preferences.
 - Store messages by class id instead of using one global active-class message list.

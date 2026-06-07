@@ -12,14 +12,19 @@
     },
     "ios": {
       "bundleIdentifier": "com.eduverse.mobile",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Eduverse uses the camera for live class sessions.",
+        "NSMicrophoneUsageDescription": "Eduverse uses the microphone for live class sessions."
+      },
       "supportsTablet": true
     },
     "android": {
       "edgeToEdgeEnabled": true,
       "package": "com.eduverse.mobile",
+      "permissions": ["CAMERA", "RECORD_AUDIO"],
       "softwareKeyboardLayoutMode": "resize"
     },
-    "plugins": ["expo-notifications"],
+    "plugins": ["expo-notifications", "@livekit/react-native-expo-plugin", "@config-plugins/react-native-webrtc"],
     "web": {
       "bundler": "metro"
     }
