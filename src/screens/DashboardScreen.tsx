@@ -4,6 +4,7 @@ import { FileText, Radio } from "lucide-react-native";
 import { InfoPanel } from "@/components/cards/InfoPanel";
 import { MetricCard, type Metric } from "@/components/cards/MetricCard";
 import { NotificationRow } from "@/components/cards/NotificationRow";
+import { AppHeader } from "@/components/layout/AppHeader";
 import { ActionButton } from "@/components/common/ActionButton";
 import { Section } from "@/components/common/Section";
 import { useEduverse } from "@/providers/EduverseProvider";
@@ -21,8 +22,9 @@ export function DashboardScreen({ stats, isTablet }: DashboardScreenProps) {
 
   return (
     <View>
+      <AppHeader />
       <Section title="Today" action="Offline cache ready" />
-      <View className="rounded-xl bg-primary p-5">
+      <View className="rounded-2xl bg-brand-500 p-5 dark:bg-brand-700">
         <Text className="text-sm font-bold uppercase text-indigo-100">Live or next class</Text>
         <Text className="mt-2 text-2xl font-bold text-white">{activeClass?.name ?? "No active class"}</Text>
         <Text className="mt-1 text-sm text-indigo-100">

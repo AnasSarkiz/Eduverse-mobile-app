@@ -6,7 +6,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Bell, BookOpen, CheckCircle2, Clock, LayoutDashboard, MessageSquare, MoreHorizontal, TrendingUp } from "lucide-react-native";
 
 import { BottomTabs } from "@/components/layout/BottomTabs";
-import { AppHeader } from "@/components/layout/AppHeader";
 import { EduverseProvider, useEduverse } from "@/providers/EduverseProvider";
 import { AuthScreen } from "@/screens/AuthScreen";
 import { ChatScreen } from "@/screens/ChatScreen";
@@ -112,26 +111,38 @@ function AppContent() {
   return (
     <SafeAreaView className="flex-1 bg-background dark:bg-dark-background">
       <View className="flex-1">
-        <ScrollView
-          className="flex-1"
-          contentContainerStyle={{
-            alignSelf: "center",
-            maxWidth: contentMaxWidth,
-            paddingBottom: 104,
-            paddingHorizontal: contentPadding,
-            paddingTop: 12,
-            width: "100%"
-          }}
-        >
-          <AppHeader />
-          {activeTab === "dashboard" ? <DashboardScreen stats={stats} isTablet={isTablet} /> : null}
-          {activeTab === "courses" ? <CoursesScreen isTablet={isTablet} /> : null}
-          {activeTab === "tasks" ? <TasksScreen isTablet={isTablet} /> : null}
-          {activeTab === "chat" ? <ChatScreen isTablet={isTablet} /> : null}
-          {activeTab === "more" ? (
-            <MoreScreen onSignOut={signOutUser} isTablet={isTablet} />
-          ) : null}
-        </ScrollView>
+        {activeTab === "chat" ? (
+          <View
+            className="flex-1"
+            style={{
+              alignSelf: "center",
+              maxWidth: contentMaxWidth,
+              paddingBottom: 104,
+              paddingHorizontal: contentPadding,
+              paddingTop: 12,
+              width: "100%"
+            }}
+          >
+            <ChatScreen isTablet={isTablet} />
+          </View>
+        ) : (
+          <ScrollView
+            className="flex-1"
+            contentContainerStyle={{
+              alignSelf: "center",
+              maxWidth: contentMaxWidth,
+              paddingBottom: 104,
+              paddingHorizontal: contentPadding,
+              paddingTop: 12,
+              width: "100%"
+            }}
+          >
+            {activeTab === "dashboard" ? <DashboardScreen stats={stats} isTablet={isTablet} /> : null}
+            {activeTab === "courses" ? <CoursesScreen isTablet={isTablet} /> : null}
+            {activeTab === "tasks" ? <TasksScreen isTablet={isTablet} /> : null}
+            {activeTab === "more" ? <MoreScreen onSignOut={signOutUser} isTablet={isTablet} /> : null}
+          </ScrollView>
+        )}
 
         <BottomTabs activeTab={activeTab} contentMaxWidth={contentMaxWidth} onChangeTab={setActiveTab} tabs={tabs} />
       </View>
