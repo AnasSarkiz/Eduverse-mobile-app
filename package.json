@@ -5,7 +5,7 @@
   "engines": {
     "node": ">=22 <23"
   },
-  "main": "node_modules/expo/AppEntry.js",
+  "main": "index.js",
   "scripts": {
     "start": "expo start",
     "start:clear": "expo start --clear",
@@ -26,7 +26,9 @@
     "expo": "~54.0.0",
     "expo-constants": "~18.0.13",
     "expo-dev-client": "~6.0.21",
+    "expo-file-system": "~19.0.23",
     "expo-notifications": "~0.32.16",
+    "expo-sharing": "~14.0.8",
     "livekit-client": "^2.19.1",
     "lucide-react-native": "^1.17.0",
     "nativewind": "^4.1.23",

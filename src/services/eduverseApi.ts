@@ -431,14 +431,39 @@ export async function sendClassMessage(input: {
   );
 }
 
+type MaterialDownloadUrlPayload = {
+  disposition: "inline" | "attachment";
+  downloadUrl?: string;
+  expiresIn?: number;
+  fileName: string;
+  mimeType: string;
+  url?: string;
+};
+
 export async function loadMaterialDownloadUrl(classId: string, materialId: string, disposition: "inline" | "attachment" = "inline") {
-  return apiRequest<{
+  const payload = await apiRequest<MaterialDownloadUrlPayload>(
+    `/api/classes/${classId}/materials/${materialId}/download-url?disposition=${disposition}`
+  );
+  const url = payload.downloadUrl ?? payload.url;
+
+  if (!url) {
+    throw new Error("The Eduverse API did not return a material download URL.");
+  }
+
+  return {
+    disposition: payload.disposition,
+    fileName: payload.fileName,
+    mimeType: payload.mimeType,
+    url
+  };
+}
+
+export type MaterialDownloadUrl = {
     disposition: "inline" | "attachment";
     fileName: string;
     mimeType: string;
     url: string;
-  }>(`/api/classes/${classId}/materials/${materialId}/download-url?disposition=${disposition}`);
-}
+};
 
 function toAppRole(role?: OrganizationUserRole | null): AppRole {
   if (role === "teacher") return "teacher";

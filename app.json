@@ -24,7 +24,12 @@
       "permissions": ["CAMERA", "RECORD_AUDIO"],
       "softwareKeyboardLayoutMode": "resize"
     },
-    "plugins": ["expo-notifications", "@livekit/react-native-expo-plugin", "@config-plugins/react-native-webrtc"],
+    "plugins": [
+      "expo-notifications",
+      "@livekit/react-native-expo-plugin",
+      "@config-plugins/react-native-webrtc",
+      "./plugins/withDisableIosUserScriptSandboxing"
+    ],
     "web": {
       "bundler": "metro"
     }

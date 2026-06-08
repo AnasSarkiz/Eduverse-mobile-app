@@ -42,6 +42,7 @@ function AppContent() {
     isAuthenticated,
     isLoading,
     notifications,
+    selectClass,
     signIn,
     signOutUser,
     signUp,
@@ -50,6 +51,7 @@ function AppContent() {
   const { width } = useWindowDimensions();
   const [authMode, setAuthMode] = useState<AuthMode>("login");
   const [activeTab, setActiveTab] = useState<ScreenKey>("dashboard");
+  const [materialClassRequest, setMaterialClassRequest] = useState<{ classId: string; id: number } | null>(null);
   const isCompact = width < 360;
   const isTablet = width >= 768;
   const contentPadding = isCompact ? 14 : isTablet ? 28 : 20;
@@ -137,8 +139,21 @@ function AppContent() {
               width: "100%"
             }}
           >
-            {activeTab === "dashboard" ? <DashboardScreen stats={stats} isTablet={isTablet} /> : null}
-            {activeTab === "courses" ? <CoursesScreen isTablet={isTablet} /> : null}
+            {activeTab === "dashboard" ? (
+              <DashboardScreen
+                stats={stats}
+                isTablet={isTablet}
+                onOpenClass={(classId) => {
+                  void selectClass(classId);
+                  setActiveTab("chat");
+                }}
+                onOpenMaterials={(classId) => {
+                  setMaterialClassRequest({ classId, id: Date.now() });
+                  setActiveTab("courses");
+                }}
+              />
+            ) : null}
+            {activeTab === "courses" ? <CoursesScreen isTablet={isTablet} materialClassRequest={materialClassRequest} /> : null}
             {activeTab === "tasks" ? <TasksScreen isTablet={isTablet} /> : null}
             {activeTab === "more" ? <MoreScreen onSignOut={signOutUser} isTablet={isTablet} /> : null}
           </ScrollView>

@@ -11,11 +11,13 @@ import { useEduverse } from "@/providers/EduverseProvider";
 
 type DashboardScreenProps = {
   isTablet: boolean;
+  onOpenClass: (classId: string) => void;
+  onOpenMaterials: (classId: string) => void;
   stats: Metric[];
 };
 
-export function DashboardScreen({ stats, isTablet }: DashboardScreenProps) {
-  const { activeClass, assignments, joinLiveSession, liveSessions, markRead, notifications, selectClass, user } = useEduverse();
+export function DashboardScreen({ stats, isTablet, onOpenClass, onOpenMaterials }: DashboardScreenProps) {
+  const { activeClass, assignments, joinLiveSession, liveSessions, markRead, notifications, user } = useEduverse();
   const nextTask = assignments.find((assignment) => !assignment.mySubmission) ?? assignments[0] ?? null;
   const activeClassIsLive = activeClass ? liveSessions.some((session) => session.class_id === activeClass.id) : false;
   const canStartSession = user?.role === "admin" || user?.role === "teacher";
@@ -33,7 +35,7 @@ export function DashboardScreen({ stats, isTablet }: DashboardScreenProps) {
         <View className="mt-4 flex-row flex-wrap gap-2">
           <ActionButton
             icon={Radio}
-            label={activeClassIsLive ? "Join live" : canStartSession ? "Start live" : "Open class"}
+            label={activeClassIsLive ? "Join live" : canStartSession ? "Start live" : "Class chat"}
             isPrimary={activeClassIsLive || canStartSession}
             onPress={() => {
               if (!activeClass) return;
@@ -41,10 +43,10 @@ export function DashboardScreen({ stats, isTablet }: DashboardScreenProps) {
                 void joinLiveSession(activeClass.id);
                 return;
               }
-              void selectClass(activeClass.id);
+              onOpenClass(activeClass.id);
             }}
           />
-          <ActionButton icon={FileText} label="View materials" />
+          <ActionButton icon={FileText} label="Materials" onPress={activeClass ? () => onOpenMaterials(activeClass.id) : undefined} />
         </View>
       </View>
 

@@ -1,5 +1,4 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import { Linking } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { User } from "@supabase/supabase-js";
 
@@ -44,6 +43,7 @@ import {
   type NotificationRecord,
   type OrganizationClass
 } from "@/services/eduverseApi";
+import { downloadAndShareMaterial } from "@/services/materialDownloads";
 
 type DataStatus = "idle" | "loading" | "ready" | "error";
 
@@ -64,6 +64,7 @@ type EduverseContextValue = {
   activeOrganization: AppOrganization | null;
   assignments: ClassAssignment[];
   classes: OrganizationClass[];
+  downloadingMaterialId: string | null;
   errorMessage: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
@@ -102,6 +103,7 @@ export function EduverseProvider({ children }: { children: ReactNode }) {
   const [activeOrganization, setActiveOrganization] = useState<AppOrganization | null>(null);
   const [assignments, setAssignments] = useState<ClassAssignment[]>([]);
   const [classes, setClasses] = useState<OrganizationClass[]>([]);
+  const [downloadingMaterialId, setDownloadingMaterialId] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [liveSessions, setLiveSessions] = useState<ClassLiveSession[]>([]);
   const [materials, setMaterials] = useState<ClassMaterial[]>([]);
@@ -410,10 +412,18 @@ export function EduverseProvider({ children }: { children: ReactNode }) {
 
     try {
       setErrorMessage(null);
-      const download = await loadMaterialDownloadUrl(material.classId, material.id);
-      await Linking.openURL(download.url);
+      setDownloadingMaterialId(material.id);
+      const download = await loadMaterialDownloadUrl(material.classId, material.id, "attachment");
+      await downloadAndShareMaterial({
+        fileName: download.fileName || material.originalFilename || material.title,
+        mimeType: download.mimeType || material.mimeType,
+        title: material.title,
+        url: download.url
+      });
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : "Could not open this material.");
+      setErrorMessage(error instanceof Error ? error.message : "Could not download this material.");
+    } finally {
+      setDownloadingMaterialId(null);
     }
   }
 
@@ -443,6 +453,7 @@ export function EduverseProvider({ children }: { children: ReactNode }) {
     activeOrganization,
     assignments,
     classes,
+    downloadingMaterialId,
     errorMessage,
     forgotPassword,
     isAuthenticated: Boolean(authUser),

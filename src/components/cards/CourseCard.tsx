@@ -23,10 +23,11 @@ type CourseCardProps = {
   course: CourseCardModel;
   isTablet: boolean;
   onOpenChat?: () => void;
+  onOpenMaterials?: () => void;
   onOpenSession?: () => void;
 };
 
-export function CourseCard({ course, isTablet, onOpenChat, onOpenSession }: CourseCardProps) {
+export function CourseCard({ course, isTablet, onOpenChat, onOpenMaterials, onOpenSession }: CourseCardProps) {
   const sessionAvailable = course.liveNow || course.canStartSession;
 
   return (
@@ -51,7 +52,7 @@ export function CourseCard({ course, isTablet, onOpenChat, onOpenSession }: Cour
       <View className="mt-4 flex-row gap-2">
         <ActionButton icon={Radio} label={course.liveNow ? "Join live" : course.canStartSession ? "Start live" : "Session"} isPrimary={course.liveNow} onPress={sessionAvailable ? onOpenSession : undefined} />
         <ActionButton icon={MessageSquare} label="Chat" onPress={onOpenChat} />
-        <ActionButton icon={FileText} label="Materials" />
+        <ActionButton icon={FileText} label="Materials" onPress={onOpenMaterials} />
       </View>
       <Text className="mt-3 text-xs font-semibold text-muted-foreground dark:text-dark-muted-foreground">
         {course.materials} materials · {course.unreadMessages} unread messages
