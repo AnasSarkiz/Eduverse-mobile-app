@@ -1,6 +1,6 @@
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Building2, GraduationCap, ShieldCheck, Sparkles } from "lucide-react-native";
+import { GraduationCap } from "lucide-react-native";
 import { useState } from "react";
 
 import { FormInput } from "@/components/common/FormInput";
@@ -34,11 +34,6 @@ export function AuthScreen({
   const [isPending, setIsPending] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
   const [password, setPassword] = useState("");
-  const steps = [
-    { description: "Supabase email and password.", icon: ShieldCheck, title: "Auth" },
-    { description: "Choose your organization.", icon: Building2, title: "Org hub" },
-    { description: "Open the right role view.", icon: Sparkles, title: "Workspace" }
-  ];
   const titleSizeClass = isCompact ? "text-4xl" : "text-5xl";
 
   function changeMode(mode: AuthMode) {
@@ -99,32 +94,15 @@ export function AuthScreen({
                 </View>
                 <Text className="px-2 text-sm font-bold text-sky-50">Eduverse</Text>
               </View>
-              <Text className="text-xs font-bold uppercase tracking-widest text-sky-200">Learning workspace</Text>
               <Text className={`${titleSizeClass} mt-3 font-black leading-tight text-white`}>
-                Start with your organizations.
+                Eduverse
               </Text>
               <Text className="mt-4 text-base leading-7 text-slate-300">
-                Sign in first, then choose which organization to enter. Owners, admins, teachers, and students each get the right mobile workspace.
+                Sign in to continue to your classes, chats, tasks, and materials.
               </Text>
             </View>
 
-            <View className="mb-4 flex-row gap-2">
-              {steps.map((step) => {
-                const Icon = step.icon;
-
-                return (
-                  <View key={step.title} className="flex-1 rounded-xl border border-white/10 bg-white/10 p-3">
-                    <View className="mb-3 h-8 w-8 items-center justify-center rounded-full bg-sky-400/20">
-                      <Icon color="#7dd3fc" size={16} strokeWidth={2.5} />
-                    </View>
-                    <Text className="text-xs font-black text-white">{step.title}</Text>
-                    <Text className="mt-1 text-xs leading-4 text-slate-300">{step.description}</Text>
-                  </View>
-                );
-              })}
-            </View>
-
-            <View className="rounded-3xl border border-white/10 bg-dark-card p-6 shadow-sm">
+            <View className="rounded-[32px] border border-white/10 bg-dark-card p-6 shadow-sm">
               <View className="mb-5 flex-row rounded-full bg-slate-950 p-1">
                 <Segment label="Login" isActive={authMode === "login" || authMode === "forgot"} onPress={() => changeMode("login")} />
                 <Segment label="Signup" isActive={authMode === "signup"} onPress={() => changeMode("signup")} />
@@ -183,9 +161,6 @@ export function AuthScreen({
                 </Text>
               </Pressable>
 
-              <Text className="mt-4 text-center text-xs leading-5 text-slate-400">
-                Supabase auth, organization selection, and role-based access match the web app flow.
-              </Text>
             </View>
           </View>
         </ScrollView>

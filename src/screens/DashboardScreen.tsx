@@ -25,38 +25,39 @@ export function DashboardScreen({ stats, isTablet, onOpenClass, onOpenMaterials 
   return (
     <View>
       <AppHeader />
-      <Section title="Today" action="Offline cache ready" />
-      <View className="rounded-2xl bg-brand-500 p-5 dark:bg-brand-700">
-        <Text className="text-sm font-bold uppercase text-indigo-100">Live or next class</Text>
-        <Text className="mt-2 text-2xl font-bold text-white">{activeClass?.name ?? "No active class"}</Text>
-        <Text className="mt-1 text-sm text-indigo-100">
+      <Section title="Today" action={activeClass ? "Class ready" : "No class"} />
+      <View className="overflow-hidden rounded-[32px] bg-brand-500 p-6 dark:bg-brand-700">
+        <Text className="text-[11px] font-black uppercase tracking-widest text-blue-100">Live or next class</Text>
+        <Text className="mt-3 text-3xl font-black tracking-tight text-white">{activeClass?.name ?? "No active class"}</Text>
+        <Text className="mt-2 text-sm font-semibold leading-6 text-blue-100">
           {activeClass ? `${activeClass.schedule_text ?? "No schedule"} · ${activeClass.room ?? "No room"}` : "Join or create classes from the web app."}
         </Text>
-        <View className="mt-4 flex-row flex-wrap gap-2">
-          <ActionButton
-            icon={Radio}
-            label={activeClassIsLive ? "Join live" : canStartSession ? "Start live" : "Class chat"}
-            isPrimary={activeClassIsLive || canStartSession}
-            onPress={() => {
-              if (!activeClass) return;
-              if (activeClassIsLive || canStartSession) {
-                void joinLiveSession(activeClass.id);
-                return;
-              }
-              onOpenClass(activeClass.id);
-            }}
-          />
-          <ActionButton icon={FileText} label="Materials" onPress={activeClass ? () => onOpenMaterials(activeClass.id) : undefined} />
-        </View>
+        {activeClass ? (
+          <View className="mt-4 flex-row flex-wrap gap-2">
+            <ActionButton
+              icon={Radio}
+              label={activeClassIsLive ? "Join live" : canStartSession ? "Start live" : "Class chat"}
+              isPrimary={activeClassIsLive || canStartSession}
+              onPress={() => {
+                if (activeClassIsLive || canStartSession) {
+                  void joinLiveSession(activeClass.id);
+                  return;
+                }
+                onOpenClass(activeClass.id);
+              }}
+            />
+            <ActionButton icon={FileText} label="Materials" onPress={() => onOpenMaterials(activeClass.id)} />
+          </View>
+        ) : null}
       </View>
 
-      <View className={`mt-4 ${isTablet ? "flex-row flex-wrap gap-3" : "gap-3"}`}>
+      <View className="mt-4 flex-row flex-wrap gap-3">
         {stats.map((stat) => (
           <MetricCard key={stat.label} {...stat} isTablet={isTablet} />
         ))}
       </View>
 
-      <Section title="Upcoming" action="Calendar" />
+      <Section title="Upcoming" action={assignments.length ? `${assignments.length} tasks` : "Clear"} />
       <View className={isTablet ? "flex-row gap-3" : "gap-3"}>
         <InfoPanel
           title={nextTask?.title ?? "No pending assignments"}

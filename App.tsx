@@ -119,7 +119,7 @@ function AppContent() {
             style={{
               alignSelf: "center",
               maxWidth: contentMaxWidth,
-              paddingBottom: 104,
+              paddingBottom: 176,
               paddingHorizontal: contentPadding,
               paddingTop: 12,
               width: "100%"
@@ -133,7 +133,7 @@ function AppContent() {
             contentContainerStyle={{
               alignSelf: "center",
               maxWidth: contentMaxWidth,
-              paddingBottom: 104,
+              paddingBottom: 176,
               paddingHorizontal: contentPadding,
               paddingTop: 12,
               width: "100%"

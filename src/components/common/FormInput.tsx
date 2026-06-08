@@ -32,7 +32,7 @@ export function FormInput({ label, value, onChangeText, secure = false, surface 
             ? "rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-base text-slate-950"
             : isDarkSurface
               ? "rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-base text-white"
-            : "rounded-md border border-border dark:border-dark-border bg-background dark:bg-dark-background px-4 py-3 text-base text-foreground dark:text-dark-foreground"
+            : "rounded-2xl border border-border bg-background px-4 py-3 text-base text-foreground dark:border-dark-border dark:bg-dark-background dark:text-dark-foreground"
         }
         onChangeText={(nextText) => {
           setText(nextText);

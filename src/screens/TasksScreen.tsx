@@ -21,8 +21,8 @@ export function TasksScreen({ isTablet }: { isTablet: boolean }) {
 
   return (
     <View>
-      <Section title="Assignments & Deadlines" action="Submit later" />
-      <View className={isTablet ? "flex-row flex-wrap gap-3" : "gap-3"}>
+      <Section title="Assignments & Deadlines" action={assignments.length ? `${assignments.length} total` : "Empty"} />
+      <View className={isTablet ? "flex-row flex-wrap gap-3" : "gap-4"}>
         {assignments.map((assignment) => (
           <AssignmentCard
             key={assignment.id}
@@ -45,7 +45,7 @@ export function TasksScreen({ isTablet }: { isTablet: boolean }) {
         <>
           <Section title="Submit response" action={activeAssignment.title} />
           <TextInput
-            className="min-h-24 rounded-xl border border-border dark:border-dark-border bg-card dark:bg-dark-card px-4 py-3 text-base text-foreground dark:text-dark-foreground"
+            className="min-h-32 rounded-[28px] border border-border bg-card px-5 py-4 text-base text-foreground shadow-sm dark:border-dark-border dark:bg-dark-card dark:text-dark-foreground"
             multiline
             onChangeText={setResponse}
             placeholder="Write your assignment response"
@@ -53,13 +53,17 @@ export function TasksScreen({ isTablet }: { isTablet: boolean }) {
             textAlignVertical="top"
             value={response}
           />
-          <Pressable className="mt-3 rounded-md bg-brand-500 px-4 py-3" onPress={submit}>
-            <Text className="text-center text-sm font-bold text-white">Submit assignment</Text>
+          <Pressable
+            className={`mt-4 rounded-2xl bg-brand-500 px-4 py-4 ${response.trim() ? "" : "opacity-50"}`}
+            disabled={!response.trim()}
+            onPress={submit}
+          >
+            <Text className="text-center text-sm font-black text-white">Submit assignment</Text>
           </Pressable>
         </>
       ) : null}
 
-      <Section title="Calendar" />
+      <Section title="Due dates" />
       {assignments.slice(0, 8).map((item) => (
         <SimpleRow
           key={item.id}

@@ -13,10 +13,10 @@ type MetricCardProps = Metric & {
 };
 
 const toneClassNames: Record<Metric["tone"], string> = {
-  amber: "border-amber-100 bg-amber-50",
-  emerald: "border-emerald-100 bg-emerald-50",
-  indigo: "border-indigo-100 bg-indigo-50",
-  violet: "border-violet-100 bg-violet-50"
+  amber: "bg-amber-100 dark:bg-amber-400/15",
+  emerald: "bg-emerald-100 dark:bg-emerald-400/15",
+  indigo: "bg-brand-subtle dark:bg-dark-brand-subtle",
+  violet: "bg-violet-100 dark:bg-violet-400/15"
 };
 
 const iconColorByTone: Record<Metric["tone"], string> = {
@@ -28,14 +28,14 @@ const iconColorByTone: Record<Metric["tone"], string> = {
 
 export function MetricCard({ label, value, tone, icon: Icon, isTablet }: MetricCardProps) {
   return (
-    <View className="rounded-xl border border-border dark:border-dark-border bg-card dark:bg-dark-card p-4 shadow-sm" style={{ width: isTablet ? "23.5%" : "100%" }}>
-      <View className="flex-row items-center gap-3">
-        <View className={`h-9 w-9 items-center justify-center rounded-lg ${toneClassNames[tone]}`}>
+    <View className="rounded-3xl border border-border bg-card p-4 shadow-sm dark:border-dark-border dark:bg-dark-card" style={{ width: isTablet ? "23.5%" : "48%" }}>
+      <View className="gap-4">
+        <View className={`h-11 w-11 items-center justify-center rounded-2xl ${toneClassNames[tone]}`}>
           <Icon color={iconColorByTone[tone]} size={18} strokeWidth={2.3} />
         </View>
         <View className="min-w-0 flex-1">
-          <Text className="text-xs text-muted-foreground dark:text-dark-muted-foreground">{label}</Text>
-          <Text className="mt-0.5 text-xl font-bold text-foreground dark:text-dark-foreground">{value}</Text>
+          <Text className="text-xs font-bold text-muted-foreground dark:text-dark-muted-foreground">{label}</Text>
+          <Text className="mt-1 text-2xl font-black text-foreground dark:text-dark-foreground">{value}</Text>
         </View>
       </View>
     </View>

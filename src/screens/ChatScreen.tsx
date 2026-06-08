@@ -44,7 +44,7 @@ export function ChatScreen({ isTablet }: { isTablet: boolean }) {
         className="flex-1 gap-3"
         keyboardVerticalOffset={92}
       >
-        <View className="flex-row items-center gap-3 rounded-3xl border border-border bg-card p-3 shadow-sm dark:border-dark-border dark:bg-dark-card">
+        <View className="flex-row items-center gap-3 rounded-[28px] border border-border bg-card p-3 shadow-sm dark:border-dark-border dark:bg-dark-card">
           <Pressable
             className="h-11 w-11 items-center justify-center rounded-2xl bg-muted dark:bg-dark-muted"
             onPress={() => {
@@ -133,7 +133,7 @@ function ClassConversation({
 }) {
   return (
     <View className="min-h-0 flex-1 gap-3">
-      <View className="min-h-0 flex-1 overflow-hidden rounded-3xl bg-muted/50 dark:bg-dark-muted/30">
+      <View className="min-h-0 flex-1 overflow-hidden rounded-[30px] border border-border bg-muted/50 dark:border-dark-border dark:bg-dark-muted/30">
         <ScrollView
           className="flex-1"
           contentContainerStyle={{ gap: 12, paddingBottom: 18, paddingHorizontal: 8, paddingTop: 16 }}
@@ -157,7 +157,7 @@ function ClassConversation({
         </ScrollView>
       </View>
 
-      <View className="flex-row items-end gap-2 rounded-3xl border border-border bg-card px-3 py-2 shadow-sm dark:border-dark-border dark:bg-dark-card">
+      <View className="flex-row items-end gap-2 rounded-[28px] border border-border bg-card px-3 py-2 shadow-sm dark:border-dark-border dark:bg-dark-card">
         <TextInput
           className="max-h-28 flex-1 py-2 text-base text-foreground dark:text-dark-foreground"
           multiline
@@ -168,6 +168,7 @@ function ClassConversation({
         />
         <Pressable
           className={`h-11 w-11 items-center justify-center rounded-2xl ${input.trim() ? "bg-brand-500" : "bg-muted dark:bg-dark-muted"}`}
+          disabled={!input.trim()}
           onPress={onSubmit}
         >
           <Send color={input.trim() ? "#ffffff" : placeholderColor} size={19} strokeWidth={2.6} />
@@ -192,7 +193,7 @@ function ClassThreadCard({
 }) {
   return (
     <Pressable
-      className={`rounded-2xl border p-4 shadow-sm ${
+      className={`rounded-[28px] border p-5 shadow-sm ${
         active ? "border-brand-500 bg-brand-subtle dark:border-sky-400 dark:bg-dark-brand-subtle" : "border-border bg-card dark:border-dark-border dark:bg-dark-card"
       }`}
       onPress={onPress}
@@ -200,11 +201,11 @@ function ClassThreadCard({
     >
       <View className="flex-row items-start justify-between gap-3">
         <View className="min-w-0 flex-1 flex-row items-center gap-3">
-          <View className={`h-12 w-12 items-center justify-center rounded-2xl ${active ? "bg-brand-500" : "bg-sky-500/15"}`}>
-            <UsersRound color={active ? "#ffffff" : "#38bdf8"} size={21} strokeWidth={2.5} />
+          <View className={`h-14 w-14 items-center justify-center rounded-3xl ${active ? "bg-brand-500" : "bg-sky-500/15"}`}>
+            <UsersRound color={active ? "#ffffff" : "#38bdf8"} size={23} strokeWidth={2.5} />
           </View>
           <View className="min-w-0 flex-1">
-            <Text className="text-base font-black text-foreground dark:text-dark-foreground" numberOfLines={1}>
+            <Text className="text-lg font-black text-foreground dark:text-dark-foreground" numberOfLines={1}>
               {classItem.name}
             </Text>
             <Text className="mt-1 text-xs font-bold uppercase text-muted-foreground dark:text-dark-muted-foreground" numberOfLines={1}>
@@ -214,7 +215,7 @@ function ClassThreadCard({
         </View>
         {active ? <Badge label="Open" /> : null}
       </View>
-      <Text className="mt-4 text-sm leading-5 text-muted-foreground dark:text-dark-muted-foreground" numberOfLines={2}>
+      <Text className="mt-4 text-sm font-semibold leading-5 text-muted-foreground dark:text-dark-muted-foreground" numberOfLines={2}>
         {active && messageCount ? `${messageCount} messages in this class conversation.` : "Tap to open this class conversation."}
       </Text>
     </Pressable>
@@ -238,7 +239,7 @@ function MessageBubble({ isMe, message }: { isMe: boolean; message: ChatMessage 
 
 function AnnouncementCard({ announcement }: { announcement: NotificationRecord }) {
   return (
-    <View className="rounded-2xl border border-border bg-card p-4 shadow-sm dark:border-dark-border dark:bg-dark-card">
+    <View className="rounded-[28px] border border-border bg-card p-5 shadow-sm dark:border-dark-border dark:bg-dark-card">
       <View className="flex-row items-start gap-3">
         <View className="h-11 w-11 items-center justify-center rounded-2xl bg-amber-400/20">
           <Megaphone color="#f59e0b" size={20} strokeWidth={2.5} />
@@ -257,7 +258,7 @@ function AnnouncementCard({ announcement }: { announcement: NotificationRecord }
 
 function EmptyState({ body, compact = false, title }: { body: string; compact?: boolean; title: string }) {
   return (
-    <View className={`items-center justify-center rounded-2xl border border-dashed border-border bg-muted/40 px-5 dark:border-dark-border dark:bg-dark-muted/30 ${compact ? "py-6" : "py-8"}`}>
+    <View className={`items-center justify-center rounded-[28px] border border-dashed border-border bg-muted/40 px-5 dark:border-dark-border dark:bg-dark-muted/30 ${compact ? "py-6" : "py-8"}`}>
       <Text className="text-center text-base font-black text-foreground dark:text-dark-foreground">{title}</Text>
       <Text className="mt-2 text-center text-sm leading-5 text-muted-foreground dark:text-dark-muted-foreground">{body}</Text>
     </View>

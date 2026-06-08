@@ -55,7 +55,7 @@ export function CoursesScreen({ isTablet, materialClassRequest }: { isTablet: bo
   return (
     <View>
       <Section title="Courses & Classes" action={`${classes.length} enrolled`} />
-      <View className={isTablet ? "flex-row flex-wrap gap-3" : "gap-3"}>
+      <View className={isTablet ? "flex-row flex-wrap gap-3" : "gap-4"}>
         {classes.map((classItem) => (
           <CourseCard
             key={classItem.id}
@@ -153,15 +153,15 @@ function ClassMaterialsScreen({
         </View>
       </View>
 
-      <View className="rounded-3xl bg-brand-subtle p-5 dark:bg-dark-brand-subtle">
-        <Text className="text-xs font-black uppercase text-brand-600">Class library</Text>
-        <Text className="mt-2 text-3xl font-black text-foreground dark:text-dark-foreground">{materials.length}</Text>
-        <Text className="mt-1 text-sm text-muted-foreground dark:text-dark-muted-foreground">
+      <View className="rounded-[32px] border border-border bg-card p-5 shadow-sm dark:border-dark-border dark:bg-dark-card">
+        <Text className="text-[11px] font-black uppercase tracking-widest text-brand-600 dark:text-sky-300">Class library</Text>
+        <Text className="mt-3 text-4xl font-black text-foreground dark:text-dark-foreground">{materials.length}</Text>
+        <Text className="mt-1 text-sm font-semibold text-muted-foreground dark:text-dark-muted-foreground">
           {materials.length === 1 ? "material available" : "materials available"}
         </Text>
       </View>
 
-      <View className="mt-5 flex-row items-center gap-2 rounded-2xl border border-border bg-card px-3 py-2 dark:border-dark-border dark:bg-dark-card">
+      <View className="mt-5 flex-row items-center gap-2 rounded-3xl border border-border bg-card px-4 py-2 shadow-sm dark:border-dark-border dark:bg-dark-card">
         <Search color={placeholderColor} size={18} strokeWidth={2.4} />
         <TextInput
           className="flex-1 py-2 text-base text-foreground dark:text-dark-foreground"
@@ -179,7 +179,7 @@ function ClassMaterialsScreen({
 
       <Section title="Files" action={query.trim() ? `${filteredMaterials.length} found` : materials.length ? "Tap to open" : "Empty"} />
       {isMaterialError(errorMessage) ? <InlineError text={errorMessage} /> : null}
-      <View className="gap-3">
+      <View className="gap-4">
         {filteredMaterials.map((material) => (
           <MaterialCard
             classCode={classItem.code}
@@ -214,20 +214,20 @@ function MaterialCard({
 
   return (
     <Pressable
-      className={`rounded-2xl border border-border bg-card p-4 shadow-sm dark:border-dark-border dark:bg-dark-card ${isDownloading ? "opacity-75" : ""}`}
+      className={`rounded-[28px] border border-border bg-card p-5 shadow-sm dark:border-dark-border dark:bg-dark-card ${isDownloading ? "opacity-75" : ""}`}
       disabled={isDownloading}
       onPress={onOpen}
       style={{ width: isTablet ? "48.5%" : "100%" }}
     >
       <View className="flex-row items-start gap-3">
-        <View className={`h-12 w-12 items-center justify-center rounded-2xl ${tone.background}`}>
-          <Icon color={tone.color} size={22} strokeWidth={2.4} />
+        <View className={`h-14 w-14 items-center justify-center rounded-3xl ${tone.background}`}>
+          <Icon color={tone.color} size={24} strokeWidth={2.5} />
         </View>
         <View className="min-w-0 flex-1">
-          <Text className="text-base font-black text-foreground dark:text-dark-foreground" numberOfLines={2}>
+          <Text className="text-lg font-black text-foreground dark:text-dark-foreground" numberOfLines={2}>
             {material.title}
           </Text>
-          <Text className="mt-1 text-xs font-bold uppercase text-muted-foreground dark:text-dark-muted-foreground" numberOfLines={1}>
+          <Text className="mt-1 text-[11px] font-black uppercase text-muted-foreground dark:text-dark-muted-foreground" numberOfLines={1}>
             {classCode} · {material.type} · {formatBytes(material.sizeBytes)}
           </Text>
           {material.description ? (
@@ -236,11 +236,11 @@ function MaterialCard({
             </Text>
           ) : null}
         </View>
-        <View className="h-9 w-9 items-center justify-center rounded-xl bg-muted dark:bg-dark-muted">
+        <View className="h-11 w-11 items-center justify-center rounded-2xl bg-muted dark:bg-dark-muted">
           {isDownloading ? <ActivityIndicator color="#4f46e5" size="small" /> : <Download color="#4f46e5" size={17} strokeWidth={2.5} />}
         </View>
       </View>
-      <Text className="mt-3 text-xs font-semibold text-muted-foreground dark:text-dark-muted-foreground" numberOfLines={1}>
+      <Text className="mt-4 text-xs font-bold text-muted-foreground dark:text-dark-muted-foreground" numberOfLines={1}>
         {isDownloading ? "Downloading..." : `${material.originalFilename} · ${formatDate(material.createdAt)}`}
       </Text>
     </Pressable>

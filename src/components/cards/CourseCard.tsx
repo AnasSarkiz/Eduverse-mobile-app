@@ -31,30 +31,37 @@ export function CourseCard({ course, isTablet, onOpenChat, onOpenMaterials, onOp
   const sessionAvailable = course.liveNow || course.canStartSession;
 
   return (
-    <View className="rounded-xl border border-border dark:border-dark-border bg-card dark:bg-dark-card p-4 shadow-sm" style={{ width: isTablet ? "48.5%" : "100%" }}>
+    <View className="rounded-[28px] border border-border bg-card p-5 shadow-sm dark:border-dark-border dark:bg-dark-card" style={{ width: isTablet ? "48.5%" : "100%" }}>
       <View className="flex-row items-start justify-between gap-3">
         <View className="flex-1 flex-row gap-3">
-          <View className="h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-500">
-            <BookOpen color="#ffffff" size={18} strokeWidth={2.4} />
+          <View className="h-14 w-14 shrink-0 items-center justify-center rounded-3xl bg-brand-500">
+            <BookOpen color="#ffffff" size={23} strokeWidth={2.5} />
           </View>
-          <View className="flex-1">
-            <Text className="text-xs font-bold uppercase text-brand-600">{course.code}</Text>
-            <Text className="mt-1 text-base font-bold text-foreground dark:text-dark-foreground">{course.title}</Text>
+          <View className="min-w-0 flex-1">
+            <Text className="text-[11px] font-black uppercase tracking-widest text-brand-600 dark:text-sky-300">{course.code}</Text>
+            <Text className="mt-1 text-xl font-black text-foreground dark:text-dark-foreground" numberOfLines={1}>{course.title}</Text>
             <Text className="mt-1 text-sm text-muted-foreground dark:text-dark-muted-foreground">{course.instructor}</Text>
           </View>
         </View>
         {course.liveNow ? <Badge label="Live" /> : null}
       </View>
-      <Text className="mt-3 text-sm text-muted-foreground dark:text-dark-muted-foreground">
+      <Text className="mt-4 text-sm font-semibold text-muted-foreground dark:text-dark-muted-foreground">
         {course.schedule} · {course.room}
       </Text>
       <ProgressBar value={course.progress} />
-      <View className="mt-4 flex-row gap-2">
-        <ActionButton icon={Radio} label={course.liveNow ? "Join live" : course.canStartSession ? "Start live" : "Session"} isPrimary={course.liveNow} onPress={sessionAvailable ? onOpenSession : undefined} />
+      <View className="mt-5 flex-row flex-wrap gap-2">
+        {sessionAvailable ? (
+          <ActionButton
+            icon={Radio}
+            label={course.liveNow ? "Join live" : "Start live"}
+            isPrimary={course.liveNow || course.canStartSession}
+            onPress={onOpenSession}
+          />
+        ) : null}
         <ActionButton icon={MessageSquare} label="Chat" onPress={onOpenChat} />
         <ActionButton icon={FileText} label="Materials" onPress={onOpenMaterials} />
       </View>
-      <Text className="mt-3 text-xs font-semibold text-muted-foreground dark:text-dark-muted-foreground">
+      <Text className="mt-4 text-xs font-bold text-muted-foreground dark:text-dark-muted-foreground">
         {course.materials} materials · {course.unreadMessages} unread messages
       </Text>
     </View>
