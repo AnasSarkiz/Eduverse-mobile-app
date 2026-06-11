@@ -14,12 +14,13 @@ import { DashboardScreen } from "@/screens/DashboardScreen";
 import { LiveSessionScreen } from "@/screens/LiveSessionScreen";
 import { MoreScreen } from "@/screens/MoreScreen";
 import { TasksScreen } from "@/screens/TasksScreen";
+import { UpdatesScreen } from "@/screens/UpdatesScreen";
 import type { AuthMode, ScreenKey, TabItem } from "@/types/navigation";
 
 const tabs: TabItem[] = [
   { key: "dashboard", label: "Today", icon: LayoutDashboard },
   { key: "courses", label: "Classes", icon: BookOpen },
-  { key: "tasks", label: "Tasks", icon: CheckCircle2 },
+  // { key: "tasks", label: "Tasks", icon: CheckCircle2 },
   { key: "chat", label: "Chat", icon: MessageSquare },
   { key: "more", label: "More", icon: MoreHorizontal }
 ];
@@ -151,11 +152,13 @@ function AppContent() {
                   setMaterialClassRequest({ classId, id: Date.now() });
                   setActiveTab("courses");
                 }}
+                onOpenUpdates={() => setActiveTab("updates")}
               />
             ) : null}
             {activeTab === "courses" ? <CoursesScreen isTablet={isTablet} materialClassRequest={materialClassRequest} /> : null}
             {activeTab === "tasks" ? <TasksScreen isTablet={isTablet} /> : null}
             {activeTab === "more" ? <MoreScreen onSignOut={signOutUser} isTablet={isTablet} /> : null}
+            {activeTab === "updates" ? <UpdatesScreen isTablet={isTablet} onBack={() => setActiveTab("dashboard")} /> : null}
           </ScrollView>
         )}
 

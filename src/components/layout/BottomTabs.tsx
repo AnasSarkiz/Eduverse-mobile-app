@@ -1,12 +1,12 @@
 import { Pressable, Text, View } from "react-native";
 import { useColorScheme } from "nativewind";
 
-import type { ScreenKey, TabItem } from "@/types/navigation";
+import type { ScreenKey, TabItem, TabKey } from "@/types/navigation";
 
 type BottomTabsProps = {
   activeTab: ScreenKey;
   contentMaxWidth?: number;
-  onChangeTab: (tab: ScreenKey) => void;
+  onChangeTab: (tab: TabKey) => void;
   tabs: TabItem[];
 };
 

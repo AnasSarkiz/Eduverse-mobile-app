@@ -1,12 +1,14 @@
 import { Pressable, Text, View } from "react-native";
-import { GraduationCap } from "lucide-react-native";
+import { Bell, GraduationCap } from "lucide-react-native";
 
 import { useEduverse } from "@/providers/EduverseProvider";
 
-export function AppHeader() {
-  const { activeOrganization, organizations, selectOrganization, user } = useEduverse();
+export function AppHeader({ onOpenUpdates }: { onOpenUpdates?: () => void }) {
+  const { activeOrganization, notifications, organizations, selectOrganization, user } = useEduverse();
   const firstName = user?.name.split(" ")[0] || "there";
   const role = user?.role ?? "student";
+  const unreadCount = notifications.filter((notification) => !notification.readAt).length;
+  const unreadLabel = unreadCount > 99 ? "99+" : String(unreadCount);
 
   return (
     <View className="mb-6">
@@ -27,8 +29,25 @@ export function AppHeader() {
             </Text>
           </View>
         </View>
-        <View className="rounded-full bg-brand-subtle px-3 py-2 dark:bg-dark-brand-subtle">
-          <Text className="text-[11px] font-black uppercase text-brand-600 dark:text-sky-300">{role}</Text>
+        <View className="items-end gap-2">
+          {onOpenUpdates ? (
+            <Pressable
+              accessibilityLabel={unreadCount ? `${unreadCount} unread updates` : "Open updates"}
+              accessibilityRole="button"
+              className="relative h-12 w-12 items-center justify-center rounded-3xl bg-card shadow-sm dark:bg-dark-card"
+              onPress={onOpenUpdates}
+            >
+              <Bell color="#4f46e5" size={21} strokeWidth={2.5} />
+              {unreadCount ? (
+                <View className="absolute -right-1 -top-1 min-w-6 items-center rounded-full bg-emerald-500 px-1.5 py-0.5">
+                  <Text className="text-[10px] font-black text-white">{unreadLabel}</Text>
+                </View>
+              ) : null}
+            </Pressable>
+          ) : null}
+          <View className="rounded-full bg-brand-subtle px-3 py-2 dark:bg-dark-brand-subtle">
+            <Text className="text-[11px] font-black uppercase text-brand-600 dark:text-sky-300">{role}</Text>
+          </View>
         </View>
       </View>
 

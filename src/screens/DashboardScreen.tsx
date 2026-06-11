@@ -1,5 +1,5 @@
 import { Text, View } from "react-native";
-import { FileText, Radio } from "lucide-react-native";
+import { Bell, FileText, Radio } from "lucide-react-native";
 
 import { InfoPanel } from "@/components/cards/InfoPanel";
 import { MetricCard, type Metric } from "@/components/cards/MetricCard";
@@ -13,18 +13,20 @@ type DashboardScreenProps = {
   isTablet: boolean;
   onOpenClass: (classId: string) => void;
   onOpenMaterials: (classId: string) => void;
+  onOpenUpdates: () => void;
   stats: Metric[];
 };
 
-export function DashboardScreen({ stats, isTablet, onOpenClass, onOpenMaterials }: DashboardScreenProps) {
+export function DashboardScreen({ stats, isTablet, onOpenClass, onOpenMaterials, onOpenUpdates }: DashboardScreenProps) {
   const { activeClass, assignments, joinLiveSession, liveSessions, markRead, notifications, user } = useEduverse();
   const nextTask = assignments.find((assignment) => !assignment.mySubmission) ?? assignments[0] ?? null;
   const activeClassIsLive = activeClass ? liveSessions.some((session) => session.class_id === activeClass.id) : false;
   const canStartSession = user?.role === "admin" || user?.role === "teacher";
+  const recentNotifications = notifications.slice(0, 3);
 
   return (
     <View>
-      <AppHeader />
+      <AppHeader onOpenUpdates={onOpenUpdates} />
       <Section title="Today" action={activeClass ? "Class ready" : "No class"} />
       <View className="overflow-hidden rounded-[32px] bg-brand-500 p-6 dark:bg-brand-700">
         <Text className="text-[11px] font-black uppercase tracking-widest text-blue-100">Live or next class</Text>
@@ -73,8 +75,8 @@ export function DashboardScreen({ stats, isTablet, onOpenClass, onOpenMaterials 
         />
       </View>
 
-      <Section title="Recent activity" />
-      {notifications.map((item) => (
+      <Section title="Recent activity" action={notifications.length ? `${notifications.length} updates` : undefined} />
+      {recentNotifications.map((item) => (
         <NotificationRow
           key={item.id}
           item={{
@@ -89,6 +91,11 @@ export function DashboardScreen({ stats, isTablet, onOpenClass, onOpenMaterials 
         />
       ))}
       {notifications.length === 0 ? <Text className="text-sm text-muted-foreground dark:text-dark-muted-foreground">No recent activity yet.</Text> : null}
+      {notifications.length > recentNotifications.length ? (
+        <View className="mt-1 flex-row">
+          <ActionButton icon={Bell} label="View all updates" onPress={onOpenUpdates} />
+        </View>
+      ) : null}
     </View>
   );
 }
