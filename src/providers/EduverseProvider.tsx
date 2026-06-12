@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { User } from "@supabase/supabase-js";
 
@@ -31,7 +31,6 @@ import {
   signOut,
   signUpWithPassword,
   startClassLiveSession,
-  subscribeToNotificationInserts,
   submitAssignmentText,
   type AppOrganization,
   type AppUser,
@@ -48,6 +47,7 @@ import { downloadAndShareMaterial } from "@/services/materialDownloads";
 type DataStatus = "idle" | "loading" | "ready" | "error";
 
 const PUSH_NOTIFICATIONS_KEY = "eduverse:push-notifications-enabled";
+const NOTIFICATION_POLL_INTERVAL_MS = 45_000;
 
 export type ActiveLiveSession = {
   classId: string;
@@ -114,6 +114,7 @@ export function EduverseProvider({ children }: { children: ReactNode }) {
   const [pushNotificationsEnabled, setPushNotificationsEnabledState] = useState(false);
   const [status, setStatus] = useState<DataStatus>("loading");
   const [user, setUser] = useState<AppUser | null>(null);
+  const knownNotificationIdsRef = useRef<Set<string>>(new Set());
 
   const activeClass = useMemo(() => classes.find((classItem) => classItem.id === activeClassId) ?? classes[0] ?? null, [activeClassId, classes]);
   const classIds = useMemo(() => classes.map((classItem) => classItem.id), [classes]);
@@ -136,6 +137,7 @@ export function EduverseProvider({ children }: { children: ReactNode }) {
         setMaterials([]);
         setMessages([]);
         setNotifications([]);
+        knownNotificationIdsRef.current = new Set();
         setOrganizations([]);
         setUser(null);
         setStatus("ready");
@@ -155,6 +157,7 @@ export function EduverseProvider({ children }: { children: ReactNode }) {
         setMaterials([]);
         setMessages([]);
         setNotifications([]);
+        knownNotificationIdsRef.current = new Set();
         setStatus("ready");
         return;
       }
@@ -175,6 +178,7 @@ export function EduverseProvider({ children }: { children: ReactNode }) {
       setLiveSessions(nextLiveSessions);
       setMaterials(nextMaterials);
       setNotifications(nextNotifications);
+      knownNotificationIdsRef.current = new Set(nextNotifications.map((notification) => notification.id));
 
       const firstClass = nextClasses[0];
       setMessages(firstClass ? await loadMessagesForClass(firstClass.id) : []);
@@ -228,25 +232,42 @@ export function EduverseProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!authUser || !activeOrganization) return undefined;
 
-    return subscribeToNotificationInserts({
-      organizationId: activeOrganization.id,
-      userId: authUser.id,
-      onInsert: (notification) => {
-        setNotifications((current) => {
-          if (current.some((item) => item.id === notification.id)) return current;
-          return [notification, ...current].slice(0, 30);
-        });
+    let cancelled = false;
+
+    const pollNotifications = async () => {
+      try {
+        const nextNotifications = await loadNotifications(activeOrganization.id, authUser.id);
+        if (cancelled) return;
+
+        const knownIds = knownNotificationIdsRef.current;
+        const newNotifications = nextNotifications.filter((notification) => !knownIds.has(notification.id));
+
+        knownNotificationIdsRef.current = new Set(nextNotifications.map((notification) => notification.id));
+        setNotifications(nextNotifications);
 
         if (pushNotificationsEnabled && notificationStatus === "granted") {
-          void showEduverseNotification(notification).catch(() => null);
+          for (const notification of [...newNotifications].reverse()) {
+            void showEduverseNotification(notification).catch(() => null);
+          }
         }
 
-        if (notification.type === "session_started") {
+        if (newNotifications.some((notification) => notification.type === "session_started")) {
           void refresh();
         }
+      } catch {
+        // Keep polling quiet; the main refresh path owns user-facing errors.
       }
-    });
-  }, [activeOrganization, authUser, notificationStatus, pushNotificationsEnabled]);
+    };
+
+    const intervalId = setInterval(() => {
+      void pollNotifications();
+    }, NOTIFICATION_POLL_INTERVAL_MS);
+
+    return () => {
+      cancelled = true;
+      clearInterval(intervalId);
+    };
+  }, [activeOrganization, authUser, notificationStatus, pushNotificationsEnabled, refresh]);
 
   useEffect(() => {
     if (!activeLiveSession?.isHost || !activeLiveSession.markedLiveAt) return undefined;

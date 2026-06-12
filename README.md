@@ -40,7 +40,7 @@ src/config/                 Runtime environment helpers and tests
 src/lib/                    Supabase client setup
 src/providers/              EduverseProvider for auth, profile, classes, assignments, materials, messages, and notifications
 src/screens/                Auth, dashboard, courses, tasks, chat, and more/settings screens
-src/services/               Supabase-backed Eduverse data service
+src/services/               API-backed Eduverse data and Supabase auth services
 src/types/                  Navigation and shared UI types
 ```
 
@@ -137,21 +137,23 @@ bun run typecheck      # Run TypeScript checks
 
 ## Runtime Data Flow
 
-`EduverseProvider` is the main application data boundary. It keeps Supabase auth local and sends classroom data through the Eduverse web API with the active Supabase bearer token. It handles:
+`EduverseProvider` is the main application data boundary. It keeps Supabase auth local and sends classroom data through the Eduverse web API with the active Supabase bearer token. The mobile app should not query Eduverse business tables directly.
+
+It handles:
 
 - Supabase session detection and auth state changes.
 - Loading the user profile and active organization from `/api/me`.
 - Loading organization classes, notifications, assignments, materials, and class messages from the web API.
 - Loading active class live sessions from the web API.
-- Subscribing to realtime notification inserts for the active organization.
+- Polling notification updates through the web API for the active organization.
 - Switching organizations and active classes.
 - Sending class chat messages.
 - Submitting text responses for assignments.
 - Marking notifications as read.
-- Requesting device notification permission and showing local device alerts for realtime Eduverse notification inserts while the app is running.
+- Requesting device notification permission and showing local device alerts for API-polled notification updates while the app is running.
 - Joining native LiveKit rooms after validating access through the LiveKit token API.
 - Marking teacher-started sessions live, sending heartbeats, and ending sessions through the web API.
-There is still a direct Supabase client in the app, but it is used for authentication/session state rather than classroom table access.
+There is still a direct Supabase client in the app, but it is used for authentication/session state rather than classroom table access. Keep future mobile data features behind `../Eduverse/app/api` routes unless they are purely local device concerns.
 
 ## Relationship To The Web App
 
@@ -181,7 +183,7 @@ Keep these workflows mobile-first:
 - Chat message previews are currently loaded for the active class, so non-active class previews can be incomplete.
 - Materials open through signed download URLs from the web API.
 - Some settings toggles are local UI state and are not yet persisted to user preferences.
-- Push notification settings are persisted locally, but true remote push delivery still needs a web API route/table for Expo push token registration and a server sender.
+- Push notification settings are persisted locally, but true remote push delivery still needs a web API route/table for Expo push token registration and a server sender. Foreground notification updates are currently polled through the web API.
 - Live sessions require an Expo development build because LiveKit WebRTC native modules are not available in Expo Go.
 - Live sessions support audio/video room join, start, heartbeat, and end. Whiteboard and in-session chat are still web-only.
 - Assignment submission supports text responses; file submission should be added through web API routes.

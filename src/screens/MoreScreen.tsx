@@ -75,7 +75,7 @@ export function MoreScreen({ onSignOut, isTablet }: MoreScreenProps) {
 }
 
 function getNotificationStatusText(status: "idle" | "granted" | "denied" | "unavailable") {
-  if (status === "granted") return "Device notifications are enabled for realtime Eduverse updates.";
+  if (status === "granted") return "Device notifications are enabled for Eduverse updates.";
   if (status === "denied") return "Device notifications are blocked in system settings.";
   if (status === "unavailable") return "Device notifications are unavailable on this device.";
   return "Device notification permissions have not been checked yet.";
